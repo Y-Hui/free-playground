@@ -5,6 +5,7 @@
   "description": "Feel free to write some code.",
   "author": "Y-Hui",
   "scripts": {
+    "play": "pnpm dev --filter vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
