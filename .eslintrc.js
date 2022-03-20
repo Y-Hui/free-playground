@@ -59,5 +59,23 @@ module.exports = {
     'simple-import-sort/exports': 'error',
     'import/no-extraneous-dependencies': 0,
     'react/require-default-props': 0,
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: [
+          'arrow-function',
+          'function-declaration',
+          'function-expression',
+        ],
+        unnamedComponents: [],
+      },
+    ],
+    'react/jsx-key': [
+      1,
+      {
+        checkFragmentShorthand: true,
+        warnOnDuplicates: true,
+      },
+    ],
   },
 }
