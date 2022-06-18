@@ -16,10 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "rootDir": ".",
-    "paths": {
-      "@are-visual/button-react-core": ["node_modules/@are-visual/button-react-core"]
-    }
+    "rootDir": "."
   },
   "include": ["packages/*/src", "packages/global.d.ts", "packages/*/vite-env.d.ts"]
 }

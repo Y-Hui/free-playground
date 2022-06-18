@@ -1,0 +1,6 @@
+export { Redirect } from './components'
+export type { LazyLoadFn } from './lazy-load'
+export { default as lazyLoad } from './lazy-load'
+export { default as RouterView } from './router-view'
+export type { RouteConfig } from './types/route-config'
+export { default as defineRoutes } from './utils/define-routes'
