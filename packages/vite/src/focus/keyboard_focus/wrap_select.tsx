@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react'
 
-import { useKeyboardFocus, Vector } from './context'
+import { useKeyboardFocus, Vector } from './context/focus'
 
 interface WrapInputProps extends SelectProps {
   /**

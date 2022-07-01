@@ -11,10 +11,7 @@ import {
 import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
 
-import FocusHolder from './keyboard_focus/holder'
-import KeyboardFocusContext from './keyboard_focus/keyboard_focus_context'
-import WrapInput from './keyboard_focus/wrap_input'
-import WrapSelect from './keyboard_focus/wrap_select'
+import KeyboardFocus from './keyboard_focus'
 
 const { Option } = Select
 
@@ -26,7 +23,7 @@ const Login: React.FC = () => {
   const [flag, setFlag] = useState(false)
 
   return (
-    <KeyboardFocusContext>
+    <KeyboardFocus>
       <Form
         onFinish={(e) => {
           console.log(e)
@@ -51,9 +48,9 @@ const Login: React.FC = () => {
               render(val, row, index) {
                 return (
                   <Form.Item name={[index, 'a1']} noStyle>
-                    <WrapInput y={index}>
+                    <KeyboardFocus.Input y={index}>
                       <InputNumber keyboard={false} />
-                    </WrapInput>
+                    </KeyboardFocus.Input>
                   </Form.Item>
                 )
               },
@@ -64,9 +61,9 @@ const Login: React.FC = () => {
               render(val, row, index) {
                 return (
                   <Form.Item name={[index, 'a2']} noStyle>
-                    <WrapInput y={index}>
+                    <KeyboardFocus.Input y={index}>
                       <InputNumber keyboard={false} />
-                    </WrapInput>
+                    </KeyboardFocus.Input>
                     {/* <WrapSelect y={index}>
                       <Select defaultValue="lucy" style={{ width: 120 }}>
                         <Option value="jack">Jack</Option>
@@ -86,15 +83,15 @@ const Login: React.FC = () => {
               title: 'Input',
               render(val, row, index) {
                 return (
-                  <FocusHolder y={index}>
+                  <KeyboardFocus.Holder y={index}>
                     {row.foo === 1 && !flag ? null : (
                       <Form.Item name={[index, 'a3']} noStyle>
-                        <WrapInput y={index}>
+                        <KeyboardFocus.Input y={index}>
                           <Input />
-                        </WrapInput>
+                        </KeyboardFocus.Input>
                       </Form.Item>
                     )}
-                  </FocusHolder>
+                  </KeyboardFocus.Holder>
                 )
               },
             },
@@ -103,10 +100,10 @@ const Login: React.FC = () => {
               title: 'Input',
               render(val, row, index) {
                 return (
-                  <FocusHolder y={index}>
+                  <KeyboardFocus.Holder y={index}>
                     {row.foo === 2 && !flag ? null : (
                       <Form.Item name={[index, 'a4']} noStyle>
-                        <WrapInput y={index}>
+                        <KeyboardFocus.Input y={index}>
                           <Input
                             placeholder="请按下回车"
                             onPressEnter={() => {
@@ -115,10 +112,10 @@ const Login: React.FC = () => {
                               })
                             }}
                           />
-                        </WrapInput>
+                        </KeyboardFocus.Input>
                       </Form.Item>
                     )}
-                  </FocusHolder>
+                  </KeyboardFocus.Holder>
                 )
               },
             },
@@ -139,7 +136,7 @@ const Login: React.FC = () => {
           ]}
         />
       </Form>
-    </KeyboardFocusContext>
+    </KeyboardFocus>
   )
 }
 

@@ -1,12 +1,12 @@
 import _ from 'lodash'
 import React, { PropsWithChildren, useMemo, useRef } from 'react'
 
+import { VECTOR_ERROR } from './constant/error'
 import {
   KeyboardFocusCtx,
   KeyboardFocusCtxValue,
   Vector,
-  VECTOR_ERROR,
-} from './context'
+} from './context/focus'
 
 /** 坐标占位符，当坐标被删除时或者预先占位时使用 */
 const ZOMBIE_POINT = Symbol('ZOMBIE_POINT')

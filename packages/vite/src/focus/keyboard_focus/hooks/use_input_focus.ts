@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { MutableRefObject, useCallback } from 'react'
 
-import type { KeyboardFocusCtxValue } from '../context'
+import type { KeyboardFocusCtxValue } from '../context/focus'
 
 interface InputFocusOptions
   extends Pick<

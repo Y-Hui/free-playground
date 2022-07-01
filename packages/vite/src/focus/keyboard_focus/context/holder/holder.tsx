@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect, useMemo, useRef } from 'react'
 
-import { HolderCtx, HolderCtxValue } from './context/holder'
-import { useKeyboardFocus } from './context/index'
+import { useKeyboardFocus } from '../focus/index'
+import { HolderCtx, HolderCtxValue } from './ctx'
 
 interface FocusHolderProps {
   y: number

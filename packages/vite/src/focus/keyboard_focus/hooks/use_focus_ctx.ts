@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 
-import { useHolder } from '../context/holder'
-import { useKeyboardFocus } from '../context/index'
+import { useKeyboardFocus } from '../context/focus/index'
+import { useHolder } from '../context/holder/ctx'
 
 export interface SetPointOptions {
   x?: number
