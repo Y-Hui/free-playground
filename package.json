@@ -5,10 +5,14 @@
   "description": "Feel free to write some code.",
   "author": "Y-Hui",
   "scripts": {
-    "play": "pnpm dev --filter vite"
+    "play": "pnpm --filter @free/vite dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.182",
+    "antd": "^4.21.4",
     "clsx": "^1.1.1",
+    "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -1,14 +1,18 @@
-import { RouterView } from '@kit/router'
-import type { FC } from 'react'
-import { HashRouter } from 'react-router-dom'
+import 'antd/dist/antd.css'
 
-import routes from './routes'
+// import { RouterView } from '@kit/router'
+import type { FC } from 'react'
+
+// import { HashRouter } from 'react-router-dom'
+import Content from './focus/index.page'
+// import routes from './routes'
 
 const App: FC = () => {
   return (
-    <HashRouter>
-      <RouterView routes={routes} />
-    </HashRouter>
+    <Content />
+    // <HashRouter>
+    //   <RouterView routes={routes} />
+    // </HashRouter>
   )
 }
 
