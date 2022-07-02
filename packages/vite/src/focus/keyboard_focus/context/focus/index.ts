@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { createContext, useContext } from 'react'
+import { createContext, MutableRefObject, useContext } from 'react'
 
 import type { VectorError } from '../../constant/error'
 
@@ -11,7 +11,7 @@ export interface Vector {
   /**
    * x 轴坐标值需要更新时调用
    */
-  setXAxisValue: (x: number) => void
+  setXAxisValue: (x?: number) => void
 }
 
 export interface SetPointOptions {
@@ -30,6 +30,10 @@ export interface SetPointHolderOptions {
 }
 
 export interface KeyboardFocusCtxValue {
+  /**
+   * 强制重新收集坐标信息（用于 useEffect deps）
+   */
+  forceRecordDepValue: MutableRefObject<number>
   /**
    * 设置坐标点，需要 y 坐标，x 坐标会自动生成
    */

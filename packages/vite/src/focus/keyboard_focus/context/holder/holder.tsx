@@ -28,6 +28,7 @@ const FocusHolder: React.FC<PropsWithChildren<FocusHolderProps>> = (props) => {
     })
     return () => {
       if (typeof xAxisIndex.current !== 'number') return
+      console.log('removeHolder', y, xAxisIndex.current)
       removePoint(xAxisIndex.current, y)
     }
   }, [removePoint, setPointHolder, y])

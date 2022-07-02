@@ -57,6 +57,7 @@ module.exports = {
     'react/jsx-fragments': 0,
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'no-unused-expressions': 0,
     'import/no-extraneous-dependencies': 0,
     'react/require-default-props': 0,
     'react/function-component-definition': [

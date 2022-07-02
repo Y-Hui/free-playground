@@ -3,6 +3,7 @@ import FocusManage from './keyboard_focus_context'
 import WrapInput from './wrap_input'
 import WrapSelect from './wrap_select'
 
+export type { KeyboardFocusRef } from './keyboard_focus_context'
 type KeyboardFocusComponent = typeof FocusManage & {
   Input: typeof WrapInput
   Select: typeof WrapSelect

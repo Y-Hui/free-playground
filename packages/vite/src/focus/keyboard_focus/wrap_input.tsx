@@ -12,32 +12,23 @@ interface WrapInputProps extends NativeInputProps {
 
 const WrapInput: React.VFC<WrapInputProps> = (props) => {
   const { y, children, ...rest } = props
-  // const holder = useHolder()
-  // const context = useKeyboardFocus()
   const context = useFocusContext()
-  const { xAxisIndex, setPoint, removePoint, setChildrenRenderState } = context
+  const {
+    xAxisIndex,
+    setPoint,
+    removePoint,
+    setChildrenRenderState,
+    forceRecordDepValue,
+  } = context
 
   const inputNode = useRef<HTMLInputElement>(null)
 
   const onKeyDown = useInputFocus({ ...context, y })
 
-  // const vector = useMemo<Vector>(() => {
-  //   return {
-  //     setXAxisValue(x) {
-  //       xIndex.current = x
-  //     },
-  //     trigger() {
-  //       if (!inputNode.current) return
-  //       inputNode.current.focus()
-  //       setTimeout(() => {
-  //         inputNode.current!.select()
-  //       })
-  //     },
-  //   }
-  // }, [xIndex])
-
+  const forceRecordDep = forceRecordDepValue.current
   useEffect(() => {
     setChildrenRenderState && setChildrenRenderState(true)
+    console.log('setPoint', y, xAxisIndex.current)
     setPoint({
       x: xAxisIndex.current,
       y,
@@ -52,9 +43,17 @@ const WrapInput: React.VFC<WrapInputProps> = (props) => {
     return () => {
       setChildrenRenderState && setChildrenRenderState(false)
       if (typeof xAxisIndex.current !== 'number') return
+      console.log('removePoint', y, xAxisIndex.current)
       removePoint(xAxisIndex.current, y)
     }
-  }, [setChildrenRenderState, removePoint, setPoint, xAxisIndex, y])
+  }, [
+    setChildrenRenderState,
+    removePoint,
+    setPoint,
+    xAxisIndex,
+    y,
+    forceRecordDep,
+  ])
 
   return cloneElement<NativeInputProps>(children, {
     ...rest,
