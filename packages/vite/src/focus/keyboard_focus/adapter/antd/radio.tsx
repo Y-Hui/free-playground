@@ -17,7 +17,9 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
     notifyRight,
     notifyTop,
     xAxisIndex,
+    forceRenderDep,
   } = useFocusContext()
+  const forceRender = forceRenderDep.current
 
   const inputNode = useRef<HTMLInputElement>(null)
 
@@ -27,10 +29,10 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
       trigger() {
         if (!inputNode.current) return
         inputNode.current.focus()
-        console.log(y, xAxisIndex.current, 'focus')
+        // console.log(y, xAxisIndex.current, 'focus')
       },
     })
-  }, [setPoint, y])
+  }, [setPoint, y, forceRender])
 
   return cloneElement<RadioProps>(children, {
     ...rest,

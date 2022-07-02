@@ -28,7 +28,9 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
     notifyRight,
     notifyTop,
     xAxisIndex,
+    forceRenderDep,
   } = context
+  const forceRender = forceRenderDep.current
 
   const selectRef = useRef<RefSelectProps>()
   // 焦点是否已经离开当前组件
@@ -44,7 +46,7 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
         selectRef.current.focus()
       },
     })
-  }, [setPoint, y])
+  }, [setPoint, y, forceRender])
 
   return cloneElement<CascaderFocusAdapterProps>(children, {
     ...rest,

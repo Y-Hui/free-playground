@@ -156,83 +156,83 @@ const Login: React.FC = () => {
         },
       },
 
-      // {
-      //   dataIndex: '2',
-      //   title: '下拉框',
-      //   width: 140,
-      //   render(val, row, index) {
-      //     warn(`column: ${index} - 下拉框`)
-      //     return (
-      //       <Form.Item name={[index, 'a2']} noStyle>
-      //         <KeyboardFocus.Input y={index}>
-      //           <InputNumber style={{ width: 100 }} keyboard={false} />
-      //         </KeyboardFocus.Input>
-      //         {/* <KeyboardFocus.AntdSelect y={index}>
-      //           <Select style={{ width: '100%' }}>
-      //             <Option value="jack">Jack</Option>
-      //             <Option value="lucy">Lucy</Option>
-      //             <Option value="Yiminghe">yiminghe</Option>
-      //           </Select>
-      //         </KeyboardFocus.AntdSelect> */}
-      //       </Form.Item>
-      //     )
-      //   },
-      // },
-      // {
-      //   dataIndex: '4',
-      //   title: '回车事件',
-      //   width: 200,
-      //   render(val, row, index) {
-      //     warn(`column: ${index} - 回车事件`)
-      //     return (
-      //       <Form.Item name={[index, 'a4']} noStyle>
-      //         <KeyboardFocus.Input y={index}>
-      //           <Input
-      //             placeholder="请按下回车"
-      //             onPressEnter={() => {
-      //               Modal.confirm({
-      //                 content: '哈哈哈哈',
-      //               })
-      //             }}
-      //           />
-      //         </KeyboardFocus.Input>
-      //       </Form.Item>
-      //     )
-      //   },
-      // },
-      // {
-      //   dataIndex: '88',
-      //   title: '级联',
-      //   render(val, row, index) {
-      //     warn(`column: ${index} - 级联`)
-      //     return (
-      //       <Form.Item name={[index, 'a88']} noStyle>
-      //         <KeyboardFocus.AntdCascader y={index}>
-      //           <Cascader options={options} placeholder="Please select" />
-      //         </KeyboardFocus.AntdCascader>
-      //       </Form.Item>
-      //     )
-      //   },
-      // },
-      // {
-      //   dataIndex: '5',
-      //   title: '单选框',
-      //   render(val, row, index) {
-      //     warn(`column: ${index} - 单选框`)
-      //     return (
-      //       <Form.Item name={[index, 'a5']} noStyle>
-      //         <Radio.Group name={`${index}`}>
-      //           <KeyboardFocus.AntdRadio y={index}>
-      //             <Radio value>上架</Radio>
-      //           </KeyboardFocus.AntdRadio>
-      //           <KeyboardFocus.AntdRadio y={index}>
-      //             <Radio value={false}>下架</Radio>
-      //           </KeyboardFocus.AntdRadio>
-      //         </Radio.Group>
-      //       </Form.Item>
-      //     )
-      //   },
-      // },
+      {
+        dataIndex: '2',
+        title: '下拉框',
+        width: 140,
+        render(val, row, index) {
+          warn(`column: ${index} - 下拉框`)
+          return (
+            <Form.Item name={[index, 'a2']} noStyle>
+              {/* <KeyboardFocus.Input y={index}>
+                <InputNumber style={{ width: 100 }} keyboard={false} />
+              </KeyboardFocus.Input> */}
+              <KeyboardFocus.AntdSelect y={index}>
+                <Select style={{ width: '100%' }}>
+                  <Option value="jack">Jack</Option>
+                  <Option value="lucy">Lucy</Option>
+                  <Option value="Yiminghe">yiminghe</Option>
+                </Select>
+              </KeyboardFocus.AntdSelect>
+            </Form.Item>
+          )
+        },
+      },
+      {
+        dataIndex: '4',
+        title: '回车事件',
+        width: 200,
+        render(val, row, index) {
+          warn(`column: ${index} - 回车事件`)
+          return (
+            <Form.Item name={[index, 'a4']} noStyle>
+              <KeyboardFocus.Input y={index}>
+                <Input
+                  placeholder="请按下回车"
+                  onPressEnter={() => {
+                    Modal.confirm({
+                      content: '哈哈哈哈',
+                    })
+                  }}
+                />
+              </KeyboardFocus.Input>
+            </Form.Item>
+          )
+        },
+      },
+      {
+        dataIndex: '88',
+        title: '级联',
+        render(val, row, index) {
+          warn(`column: ${index} - 级联`)
+          return (
+            <Form.Item name={[index, 'a88']} noStyle>
+              <KeyboardFocus.AntdCascader y={index}>
+                <Cascader options={options} placeholder="Please select" />
+              </KeyboardFocus.AntdCascader>
+            </Form.Item>
+          )
+        },
+      },
+      {
+        dataIndex: '5',
+        title: '单选框',
+        render(val, row, index) {
+          warn(`column: ${index} - 单选框`)
+          return (
+            <Form.Item name={[index, 'a5']} noStyle>
+              <Radio.Group name={`${index}`}>
+                <KeyboardFocus.AntdRadio y={index}>
+                  <Radio value>上架</Radio>
+                </KeyboardFocus.AntdRadio>
+                <KeyboardFocus.AntdRadio y={index}>
+                  <Radio value={false}>下架</Radio>
+                </KeyboardFocus.AntdRadio>
+              </Radio.Group>
+            </Form.Item>
+          )
+        },
+      },
       {
         dataIndex: 'action',
         title: '操作',

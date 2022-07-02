@@ -28,7 +28,10 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
     notifyRight,
     notifyTop,
     xAxisIndex,
+    forceRenderDep,
   } = context
+
+  const forceRender = forceRenderDep.current
 
   const selectRef = useRef<RefSelectProps>()
   // 焦点是否已经离开当前组件
@@ -45,7 +48,7 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
         setOpen(true)
       },
     })
-  }, [setPoint, y])
+  }, [setPoint, y, forceRender])
 
   return cloneElement<SelectFocusAdapterProps>(children, {
     ...rest,

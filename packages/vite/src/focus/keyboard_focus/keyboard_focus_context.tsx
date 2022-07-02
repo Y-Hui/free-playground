@@ -34,26 +34,26 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
         forceRenderDep,
-        forceRender() {
-          forceRenderDep.current += 1
-          coordinates.current.forEach((item) => {
-            _.forEach(item, (vector) => {
-              vector.setXAxisValue(undefined)
-            })
-          })
-          coordinates.current = []
-        },
+        // forceRender() {
+        //   forceRenderDep.current += 1
+        //   coordinates.current.forEach((item) => {
+        //     _.forEach(item, (vector) => {
+        //       vector.setXAxisValue(undefined)
+        //     })
+        //   })
+        //   coordinates.current = []
+        // },
         replacePoint(x, y, vector) {
           const yAxis = coordinates.current[y] || []
           yAxis[x] = vector
           coordinates.current[y] = yAxis
         },
         setPoint(options) {
-          console.log(
-            '添加坐标前：',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
-          warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
+          // console.log(
+          //   '添加坐标前：',
+          //   JSON.parse(JSON.stringify(coordinates.current)),
+          // )
+          // warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
           const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
           if (typeof x === 'number') {
@@ -64,10 +64,10 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
             coordinates.current[y] = yAxis
             vector.setXAxisValue(index - 1)
           }
-          console.log(
-            '添加坐标结果：',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
+          // console.log(
+          //   '添加坐标结果：',
+          //   JSON.parse(JSON.stringify(coordinates.current)),
+          // )
         },
         transform2Holder(x, y) {
           const yAxis = coordinates.current[y] || []
@@ -83,17 +83,17 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           vector.setXAxisValue(index - 1)
         },
         removePoint(x, y) {
-          console.log(
-            'before Remove',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
+          // console.log(
+          //   'before Remove',
+          //   JSON.parse(JSON.stringify(coordinates.current)),
+          // )
           const yAxis = coordinates.current[y]
           if (!yAxis) return
           yAxis.splice(x, 1)
-          console.log(
-            'removed',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
+          // console.log(
+          //   'removed',
+          //   JSON.parse(JSON.stringify(coordinates.current)),
+          // )
           _.forEach(coordinates.current[y], (vector, index) => {
             vector.setXAxisValue(index)
           })
