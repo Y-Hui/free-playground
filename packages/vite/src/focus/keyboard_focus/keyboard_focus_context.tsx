@@ -13,6 +13,7 @@ import {
   KeyboardFocusCtxValue,
   Vector,
 } from './context/focus'
+import { warn } from './utils/warn'
 import { createZombiePoint, isZombiePoint } from './utils/zombie_point'
 
 export interface KeyboardFocusRef {
@@ -33,17 +34,36 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
         forceRenderDep,
+        forceRender() {
+          forceRenderDep.current += 1
+          coordinates.current.forEach((item) => {
+            _.forEach(item, (vector) => {
+              vector.setXAxisValue(undefined)
+            })
+          })
+          coordinates.current = []
+        },
         replacePoint(x, y, vector) {
           const yAxis = coordinates.current[y] || []
           yAxis[x] = vector
           coordinates.current[y] = yAxis
         },
         setPoint(options) {
-          const { y, vector } = options
+          console.log(
+            '添加坐标前：',
+            JSON.parse(JSON.stringify(coordinates.current)),
+          )
+          warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
+          const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
-          const index = yAxis.push(vector)
-          coordinates.current[y] = yAxis
-          vector.setXAxisValue(index - 1)
+          if (typeof x === 'number') {
+            yAxis[x] = vector
+            vector.setXAxisValue(x)
+          } else {
+            const index = yAxis.push(vector)
+            coordinates.current[y] = yAxis
+            vector.setXAxisValue(index - 1)
+          }
           console.log(
             '添加坐标结果：',
             JSON.parse(JSON.stringify(coordinates.current)),
@@ -153,12 +173,12 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
         return {
           forceRender() {
             forceRenderDep.current += 1
-            // coordinates.current.forEach((item) => {
-            //   _.forEach(item, (vector) => {
-            //     vector.setXAxisValue(undefined)
-            //   })
-            // })
-            // coordinates.current = []
+            coordinates.current.forEach((item) => {
+              _.forEach(item, (vector) => {
+                vector.setXAxisValue(undefined)
+              })
+            })
+            coordinates.current = []
           },
         }
       },

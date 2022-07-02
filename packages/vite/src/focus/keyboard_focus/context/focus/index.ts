@@ -25,6 +25,7 @@ export interface KeyboardFocusCtxValue {
    * 强制更新
    */
   forceRenderDep: MutableRefObject<number | undefined>
+  forceRender: () => void
   /**
    * 将坐标点转换为占位符
    */

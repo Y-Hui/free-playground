@@ -15,7 +15,7 @@ export interface PointOptions {
 export default function useFocusContext() {
   // const holderCtx = useHolder()
   const context = useKeyboardFocus()
-  const { setPoint: setPointFn, removePoint } = context
+  const { setPoint: setPointFn, transform2Holder } = context
 
   const xAxisIndex = useRef<number>()
 
@@ -28,6 +28,7 @@ export default function useFocusContext() {
       console.log('添加坐标', options.foo, options.y, xAxisIndex.current)
       setPointFn({
         y: options.y,
+        x: xAxisIndex.current,
         vector: {
           name: options.foo,
           trigger: options.trigger,
@@ -37,14 +38,14 @@ export default function useFocusContext() {
         },
       })
       return () => {
-        warn(`删除坐标 ${options.foo}, ${options.y}, ${xAxisIndex.current}`)
+        warn(`转换坐标 ${options.foo}, ${options.y}, ${xAxisIndex.current}`)
         if (typeof xAxisIndex.current !== 'number') return
-        removePoint(xAxisIndex.current, options.y)
-        xAxisIndex.current = undefined
-        console.log('删除', options.foo, '坐标后 x 为', xAxisIndex.current)
+        transform2Holder(xAxisIndex.current, options.y)
+        // xAxisIndex.current = undefined
+        console.log('转换', options.foo, '坐标后 x 为', xAxisIndex.current)
       }
     },
-    [removePoint, setPointFn],
+    [transform2Holder, setPointFn],
   )
 
   return {

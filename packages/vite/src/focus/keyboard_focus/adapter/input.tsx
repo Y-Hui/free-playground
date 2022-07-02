@@ -20,13 +20,21 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
 
   const onKeyDown = useInputFocus({ ...context, y })
 
-  console.log('InputFocusAdapter', foo, y, context.xAxisIndex.current)
-
-  const x = context.xAxisIndex.current
   const forceRender = forceRenderDep.current
-
+  console.log(
+    'InputFocusAdapter',
+    foo,
+    y,
+    context.xAxisIndex.current,
+    forceRender,
+  )
   useEffect(() => {
-    console.log('InputFocusAdapter useEffect', foo, y, x, forceRender)
+    console.log(
+      'InputFocusAdapter useEffect',
+      foo,
+      y,
+      context.xAxisIndex.current,
+    )
     return setPoint({
       foo,
       y,
@@ -38,7 +46,7 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
         })
       },
     })
-  }, [setPoint, y, x, foo, forceRender])
+  }, [setPoint, y, foo, forceRender, context.xAxisIndex])
 
   return cloneElement<NativeInputProps>(children, {
     ...rest,
