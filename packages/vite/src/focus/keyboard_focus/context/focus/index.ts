@@ -20,20 +20,19 @@ export interface SetPointOptions {
   vector: Vector
 }
 
-export interface SetPointHolderOptions {
-  x?: number
-  y: number
-  /**
-   * x 轴坐标值需要更新时调用
-   */
-  setXAxisValue: (x: number) => void
-}
-
 export interface KeyboardFocusCtxValue {
   /**
    * 强制重新收集坐标信息（用于 useEffect deps）
    */
   forceRecordDepValue: MutableRefObject<number>
+  /**
+   * 插入坐标点
+   */
+  insertPoint: (options: Required<SetPointOptions>) => void
+  /**
+   * 将坐标点转换为占位符
+   */
+  transform2Holder: (x: number, y: number) => void
   /**
    * 设置坐标点，需要 y 坐标，x 坐标会自动生成
    */
@@ -41,7 +40,7 @@ export interface KeyboardFocusCtxValue {
   /**
    * 设置坐标占位符
    */
-  setPointHolder: (options: SetPointHolderOptions) => void
+  setPointHolder: (options: SetPointOptions) => void
   /**
    * 删除坐标点
    */

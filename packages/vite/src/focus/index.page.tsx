@@ -178,7 +178,7 @@ const Login: React.FC = () => {
                 type="link"
                 danger
                 onClick={() => {
-                  focus.current?.forceRecord()
+                  // focus.current?.forceRecord()
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 1)

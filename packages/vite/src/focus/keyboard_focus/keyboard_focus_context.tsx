@@ -13,10 +13,7 @@ import {
   KeyboardFocusCtxValue,
   Vector,
 } from './context/focus'
-
-/** 坐标占位符，当坐标被删除时或者预先占位时使用 */
-const ZOMBIE_POINT = Symbol('ZOMBIE_POINT')
-type ZombiePoint = typeof ZOMBIE_POINT
+import { createZombiePoint, isZombiePoint } from './utils/zombie_point'
 
 export interface KeyboardFocusRef {
   forceRecord: () => void
@@ -29,7 +26,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
      * 二维笛卡尔坐标
      * 用于记录所有表单输入组件。
      */
-    const coordinates = useRef<(Vector | ZombiePoint)[][]>([])
+    const coordinates = useRef<Vector[][]>([])
     /**
      * 强制重新收集坐标信息时的触发条件
      */
@@ -38,39 +35,56 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
         forceRecordDepValue,
-        setPoint(options) {
+        insertPoint(options) {
           const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
-          let index: number
-          if (!_.isNil(x) && _.isFinite(x)) {
-            index = x
+          console.log(isZombiePoint(yAxis[x]))
+          if (isZombiePoint(yAxis[x])) {
             yAxis[x] = vector
           } else {
-            index = yAxis.push(vector) - 1
+            yAxis.splice(x, 0, vector)
           }
-          // console.log('setPoint', y, index)
           coordinates.current[y] = yAxis
-          vector.setXAxisValue(index)
+          vector.setXAxisValue(x)
+          _.forEach(yAxis, (item, index) => {
+            item.setXAxisValue(index)
+          })
+        },
+        setPoint(options) {
+          const { y, vector } = options
+          const yAxis = coordinates.current[y] || []
+          const index = yAxis.push(vector)
+          coordinates.current[y] = yAxis
+          vector.setXAxisValue(index - 1)
+        },
+        transform2Holder(x, y) {
+          const yAxis = coordinates.current[y] || []
+          const target = yAxis[x]
+          if (!target) return
+          yAxis[x] = createZombiePoint(target)
         },
         setPointHolder(options) {
-          const { x, y, setXAxisValue } = options
+          const { y, vector } = options
           const yAxis = coordinates.current[y] || []
-          let index: number
-          if (!_.isNil(x) && _.isFinite(x)) {
-            index = x
-            yAxis[x] = ZOMBIE_POINT
-          } else {
-            index = yAxis.push(ZOMBIE_POINT) - 1
-          }
+          const index = yAxis.push(createZombiePoint(vector))
           coordinates.current[y] = yAxis
-          setXAxisValue(index)
+          vector.setXAxisValue(index - 1)
         },
         removePoint(x, y) {
-          console.log(JSON.parse(JSON.stringify(coordinates.current)))
+          console.log(
+            'before Remove',
+            JSON.parse(JSON.stringify(coordinates.current)),
+          )
           const yAxis = coordinates.current[y]
           if (!yAxis) return
-          yAxis[x] = ZOMBIE_POINT
-          console.log(JSON.parse(JSON.stringify(coordinates.current)))
+          yAxis.splice(x, 1)
+          console.log(
+            'removed',
+            JSON.parse(JSON.stringify(coordinates.current)),
+          )
+          _.forEach(coordinates.current[y], (vector, index) => {
+            vector.setXAxisValue(index)
+          })
         },
         notifyLeft(x, y) {
           if (x <= 0) return VECTOR_ERROR.X_MINIMUM
@@ -79,7 +93,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           const xIndex = x - 1
           const vector = yAxis[xIndex]
           if (!vector) return VECTOR_ERROR.NOT_X_AXIS
-          if (vector === ZOMBIE_POINT) {
+          if (isZombiePoint(vector)) {
             return result.notifyLeft(xIndex, y)
           }
           vector.trigger()
@@ -92,7 +106,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           const xIndex = x + 1
           const vector = yAxis[xIndex]
           if (!vector) return VECTOR_ERROR.NOT_X_AXIS
-          if (vector === ZOMBIE_POINT) {
+          if (isZombiePoint(vector)) {
             return result.notifyRight(xIndex, y)
           }
           vector.trigger()
@@ -110,7 +124,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           // 目标坐标点
           const vector = yAxis[x]
           // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-          if (!vector || vector === ZOMBIE_POINT) {
+          if (!vector || isZombiePoint(vector)) {
             // 坐标点向上位移一个单位
             return result.notifyLeft(x, y - 1)
           }
@@ -130,7 +144,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           // 目标坐标点
           const vector = yAxis[x]
           // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-          if (!vector || vector === ZOMBIE_POINT) {
+          if (!vector || isZombiePoint(vector)) {
             // 坐标点向下移一个单位
             return result.notifyLeft(x, y + 1)
           }
@@ -148,9 +162,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           forceRecord() {
             _.forEach(coordinates.current, (row) => {
               _.forEach(row, (vector) => {
-                if (vector !== ZOMBIE_POINT) {
-                  vector.setXAxisValue(undefined)
-                }
+                vector.setXAxisValue(undefined)
               })
             })
             forceRecordDepValue.current += 1

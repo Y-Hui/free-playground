@@ -1,9 +1,10 @@
+import _ from 'lodash'
 import { useCallback, useRef } from 'react'
 
-import { useKeyboardFocus } from '../context/focus/index'
+import { SetPointOptions, useKeyboardFocus } from '../context/focus/index'
 import { useHolder } from '../context/holder/ctx'
 
-export interface SetPointOptions {
+export interface PointOptions {
   x?: number
   y: number
   /**
@@ -15,21 +16,21 @@ export interface SetPointOptions {
 export default function useFocusContext() {
   const holderCtx = useHolder()
   const context = useKeyboardFocus()
-  const { setPoint: setPointFn } = context
+  const {
+    setPoint: setPointFn,
+    insertPoint,
+    removePoint,
+    transform2Holder,
+  } = context
 
   const xAxisIndex = useRef<number>()
 
   const index = holderCtx?.xCoordinate || xAxisIndex
 
   const setPoint = useCallback(
-    (options: SetPointOptions) => {
-      let { x } = options
-      // 占位符已经预先占用一个 x 坐标，那么直接使用这个坐标
-      if (holderCtx !== null) {
-        x = holderCtx.xCoordinate.current
-      }
-      setPointFn({
-        x,
+    (options: PointOptions) => {
+      const point: SetPointOptions = {
+        x: options.x,
         y: options.y,
         vector: {
           trigger: options.trigger,
@@ -37,9 +38,36 @@ export default function useFocusContext() {
             index.current = newXValue
           },
         },
-      })
+      }
+      const hasHolder = holderCtx !== null
+      // 占位符已经预先占用一个 x 坐标，那么直接使用这个坐标
+      if (hasHolder) {
+        const { xCoordinate, setChildrenRenderState } = holderCtx
+        point.x = xCoordinate.current
+        if (_.isFinite(point.x)) {
+          console.log('insertPoint', point.y, point.x)
+          insertPoint(point as Required<SetPointOptions>)
+        }
+        return () => {
+          console.log('removeInsertPoint', xAxisIndex.current)
+          setChildrenRenderState && setChildrenRenderState(false)
+          if (typeof xCoordinate.current !== 'number') return
+          console.log('removeInsertPoint', point.y, xAxisIndex.current)
+          // 占位符不能被删除，占位符只能被 Holder 组件自己删除。
+          transform2Holder(xCoordinate.current, point.y)
+        }
+      }
+      console.log('setPoint', point.y, point.x)
+      setPointFn(point)
+
+      return () => {
+        if (typeof xAxisIndex.current !== 'number') return
+        console.log('removePoint', point.y, xAxisIndex.current)
+        removePoint(xAxisIndex.current, point.y)
+        xAxisIndex.current = undefined
+      }
     },
-    [setPointFn, holderCtx, index],
+    [setPointFn, insertPoint, removePoint, transform2Holder, holderCtx, index],
   )
 
   return {
