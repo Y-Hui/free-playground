@@ -4,12 +4,11 @@ import React, {
   cloneElement,
   ReactElement,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react'
 
-import { useKeyboardFocus, Vector } from './context/focus'
+import useFocusContext from './hooks/use_focus_ctx'
 
 interface WrapInputProps extends SelectProps {
   /**
@@ -21,43 +20,32 @@ interface WrapInputProps extends SelectProps {
 
 const WrapInput: React.VFC<WrapInputProps> = (props) => {
   const { y, children, ...rest } = props
-  const context = useKeyboardFocus()
+  const context = useFocusContext()
   const {
     setPoint,
-    removePoint,
     notifyBottom,
     notifyLeft,
     notifyRight,
     notifyTop,
+    xAxisIndex,
   } = context
 
-  const xAxisIndex = useRef<number>()
   const selectRef = useRef<RefSelectProps>()
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)
 
   const [open, setOpen] = useState(false)
 
-  const vector = useMemo<Vector>(() => {
-    return {
-      setXAxisValue(x) {
-        xAxisIndex.current = x
-      },
+  useEffect(() => {
+    return setPoint({
+      y,
       trigger() {
         if (!selectRef.current) return
         selectRef.current.focus()
         setOpen(true)
       },
-    }
-  }, [])
-
-  useEffect(() => {
-    setPoint({ x: xAxisIndex.current, y, vector })
-    return () => {
-      if (typeof xAxisIndex.current !== 'number') return
-      removePoint(xAxisIndex.current, y)
-    }
-  }, [removePoint, setPoint, vector, y])
+    })
+  }, [setPoint, y])
 
   return cloneElement<WrapInputProps>(children, {
     ...rest,

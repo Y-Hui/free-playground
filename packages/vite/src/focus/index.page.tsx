@@ -10,7 +10,7 @@ import {
 } from 'antd'
 import { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import KeyboardFocus from './keyboard_focus'
 
@@ -76,16 +76,16 @@ const Login: React.FC = () => {
         render(val, row, index) {
           return (
             <Form.Item name={[index, 'a2']} noStyle>
-              <KeyboardFocus.Input y={index}>
+              {/* <KeyboardFocus.Input y={index}>
                 <InputNumber style={{ width: 100 }} keyboard={false} />
-              </KeyboardFocus.Input>
-              {/* <KeyboardFocus.Select y={index}>
+              </KeyboardFocus.Input> */}
+              <KeyboardFocus.Select y={index}>
                 <Select style={{ width: '100%' }}>
                   <Option value="jack">Jack</Option>
                   <Option value="lucy">Lucy</Option>
                   <Option value="Yiminghe">yiminghe</Option>
                 </Select>
-              </KeyboardFocus.Select> */}
+              </KeyboardFocus.Select>
             </Form.Item>
           )
         },
