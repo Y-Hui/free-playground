@@ -13,25 +13,16 @@ interface WrapInputProps extends NativeInputProps {
 const WrapInput: React.VFC<WrapInputProps> = (props) => {
   const { y, children, ...rest } = props
   const context = useFocusContext()
-  const {
-    xAxisIndex,
-    setPoint,
-    removePoint,
-    setChildrenRenderState,
-    forceRecordDepValue,
-  } = context
+  const { setPoint } = context
 
   const inputNode = useRef<HTMLInputElement>(null)
 
   const onKeyDown = useInputFocus({ ...context, y })
 
-  const forceRecordDep = forceRecordDepValue.current
+  // const forceRecordDep = forceRecordDepValue.current
 
   useEffect(() => {
-    // setChildrenRenderState && setChildrenRenderState(true)
-    console.log('WrapInput setPoint', y, xAxisIndex.current)
     return setPoint({
-      x: xAxisIndex.current,
       y,
       trigger() {
         if (!inputNode.current) return
@@ -41,14 +32,7 @@ const WrapInput: React.VFC<WrapInputProps> = (props) => {
         })
       },
     })
-    // return () => {
-    //   setChildrenRenderState && setChildrenRenderState(false)
-    //   if (typeof xAxisIndex.current !== 'number') return
-    //   console.log('removePoint', y, xAxisIndex.current)
-    //   removePoint(xAxisIndex.current, y)
-    //   // xAxisIndex.current = undefined
-    // }
-  }, [setPoint, xAxisIndex, y, forceRecordDep])
+  }, [setPoint, y])
 
   return cloneElement<NativeInputProps>(children, {
     ...rest,

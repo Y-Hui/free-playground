@@ -24,7 +24,7 @@ interface Data {
 const Login: React.FC = () => {
   const [data, setData] = useState<Data[]>(() =>
     _.times(4, (key) => {
-      return { key, isEdit: false }
+      return { key, isEdit: true }
     }),
   )
 

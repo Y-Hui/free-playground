@@ -38,6 +38,10 @@ export interface KeyboardFocusCtxValue {
    */
   setPoint: (options: SetPointOptions) => void
   /**
+   * 替换坐标点
+   */
+  replacePoint: (x: number, y: number, vector: Vector) => void
+  /**
    * 设置坐标占位符
    */
   setPointHolder: (options: SetPointOptions) => void

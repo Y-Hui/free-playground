@@ -35,10 +35,14 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
         forceRecordDepValue,
+        replacePoint(x, y, vector) {
+          const yAxis = coordinates.current[y] || []
+          yAxis[x] = vector
+          coordinates.current[y] = yAxis
+        },
         insertPoint(options) {
           const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
-          console.log(isZombiePoint(yAxis[x]))
           if (isZombiePoint(yAxis[x])) {
             yAxis[x] = vector
           } else {
@@ -126,7 +130,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
           if (!vector || isZombiePoint(vector)) {
             // 坐标点向上位移一个单位
-            return result.notifyLeft(x, y - 1)
+            return result.notifyTop(x, y - 1)
           }
           vector.trigger()
           return undefined
@@ -146,7 +150,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
           if (!vector || isZombiePoint(vector)) {
             // 坐标点向下移一个单位
-            return result.notifyLeft(x, y + 1)
+            return result.notifyBottom(x, y + 1)
           }
           vector.trigger()
           return undefined
