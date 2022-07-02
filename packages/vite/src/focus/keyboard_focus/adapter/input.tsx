@@ -1,16 +1,16 @@
 import React, { cloneElement, ReactElement, useEffect, useRef } from 'react'
 
-import useFocusContext from './hooks/use_focus_ctx'
-import useInputFocus from './hooks/use_input_focus'
+import useFocusContext from '../hooks/use_focus_ctx'
+import useInputFocus from '../hooks/use_input_focus'
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
-interface WrapInputProps extends NativeInputProps {
+interface InputFocusAdapterProps extends NativeInputProps {
   y: number
   children: ReactElement
 }
 
-const WrapInput: React.VFC<WrapInputProps> = (props) => {
+const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
   const { y, children, ...rest } = props
   const context = useFocusContext()
   const { setPoint } = context
@@ -46,4 +46,4 @@ const WrapInput: React.VFC<WrapInputProps> = (props) => {
   })
 }
 
-export default WrapInput
+export default InputFocusAdapter

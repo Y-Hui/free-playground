@@ -16,14 +16,9 @@ const KeyboardFocusContext: React.FC<PropsWithChildren> = (props) => {
    * 用于记录所有表单输入组件。
    */
   const coordinates = useRef<Vector[][]>([])
-  /**
-   * 强制重新收集坐标信息时的触发条件
-   */
-  const forceRecordDepValue = useRef<number>(0)
 
   const state = useMemo(() => {
     const result: KeyboardFocusCtxValue = {
-      forceRecordDepValue,
       replacePoint(x, y, vector) {
         const yAxis = coordinates.current[y] || []
         yAxis[x] = vector

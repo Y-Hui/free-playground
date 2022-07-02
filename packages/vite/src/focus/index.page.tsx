@@ -1,5 +1,6 @@
 import {
   Button,
+  Cascader,
   Form,
   Input,
   InputNumber,
@@ -20,6 +21,47 @@ interface Data {
   key: number
   isEdit: boolean
 }
+
+interface Option2 {
+  value: string | number
+  label: string
+  children?: Option2[]
+}
+
+const options: Option2[] = [
+  {
+    value: 'zhejiang',
+    label: 'Zhejiang',
+    children: [
+      {
+        value: 'hangzhou',
+        label: 'Hangzhou',
+        children: [
+          {
+            value: 'xihu',
+            label: 'West Lake',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: 'jiangsu',
+    label: 'Jiangsu',
+    children: [
+      {
+        value: 'nanjing',
+        label: 'Nanjing',
+        children: [
+          {
+            value: 'zhonghuamen',
+            label: 'Zhong Hua Men',
+          },
+        ],
+      },
+    ],
+  },
+]
 
 const Login: React.FC = () => {
   const [data, setData] = useState<Data[]>(() =>
@@ -79,13 +121,13 @@ const Login: React.FC = () => {
               {/* <KeyboardFocus.Input y={index}>
                 <InputNumber style={{ width: 100 }} keyboard={false} />
               </KeyboardFocus.Input> */}
-              <KeyboardFocus.Select y={index}>
+              <KeyboardFocus.AntdSelect y={index}>
                 <Select style={{ width: '100%' }}>
                   <Option value="jack">Jack</Option>
                   <Option value="lucy">Lucy</Option>
                   <Option value="Yiminghe">yiminghe</Option>
                 </Select>
-              </KeyboardFocus.Select>
+              </KeyboardFocus.AntdSelect>
             </Form.Item>
           )
         },
@@ -147,14 +189,31 @@ const Login: React.FC = () => {
         },
       },
       {
+        dataIndex: '88',
+        title: '级联',
+        render(val, row, index) {
+          return (
+            <Form.Item name={[index, 'a88']} noStyle>
+              <KeyboardFocus.AntdCascader y={index}>
+                <Cascader options={options} placeholder="Please select" />
+              </KeyboardFocus.AntdCascader>
+            </Form.Item>
+          )
+        },
+      },
+      {
         dataIndex: '5',
         title: '单选框',
         render(val, row, index) {
           return (
             <Form.Item name={[index, 'a5']} noStyle>
-              <Radio.Group>
-                <Radio value>上架</Radio>
-                <Radio value={false}>下架</Radio>
+              <Radio.Group name={`${index}`}>
+                <KeyboardFocus.AntdRadio y={index}>
+                  <Radio value>上架</Radio>
+                </KeyboardFocus.AntdRadio>
+                <KeyboardFocus.AntdRadio y={index}>
+                  <Radio value={false}>下架</Radio>
+                </KeyboardFocus.AntdRadio>
               </Radio.Group>
             </Form.Item>
           )

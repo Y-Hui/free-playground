@@ -1,8 +1,6 @@
-import _ from 'lodash'
 import { useCallback, useRef } from 'react'
 
-import { SetPointOptions, useKeyboardFocus } from '../context/focus/index'
-import { useHolder } from '../context/holder/ctx'
+import { useKeyboardFocus } from '../context/focus/index'
 import { warn } from '../utils/warn'
 
 export interface PointOptions {

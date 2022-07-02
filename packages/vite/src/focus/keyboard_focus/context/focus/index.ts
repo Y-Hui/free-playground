@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { createContext, MutableRefObject, useContext } from 'react'
+import { createContext, useContext } from 'react'
 
 import type { VectorError } from '../../constant/error'
 
@@ -21,10 +21,6 @@ export interface SetPointOptions {
 }
 
 export interface KeyboardFocusCtxValue {
-  /**
-   * 强制重新收集坐标信息（用于 useEffect deps）
-   */
-  forceRecordDepValue: MutableRefObject<number>
   /**
    * 插入坐标点
    */

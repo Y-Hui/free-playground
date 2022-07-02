@@ -1,14 +1,8 @@
 import _ from 'lodash'
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
+import React, { PropsWithChildren, useEffect, useMemo, useRef } from 'react'
 
 import { warn } from '../../utils/warn'
-import { SetPointOptions, useKeyboardFocus } from '../focus/index'
+import { useKeyboardFocus } from '../focus/index'
 import { HolderCtx, HolderCtxValue } from './ctx'
 
 interface FocusHolderProps {

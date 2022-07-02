@@ -1,17 +1,24 @@
+import AntdCascaderFocusAdapter from './adapter/antd/cascader'
+import AntdRadioFocusAdapter from './adapter/antd/radio'
+import AntdSelectFocusAdapter from './adapter/antd/select'
+import InputFocusAdapter from './adapter/input'
 import Holder from './context/holder/holder'
 import FocusManage from './keyboard_focus_context'
-import WrapInput from './wrap_input'
-import WrapSelect from './wrap_select'
 
 type KeyboardFocusComponent = typeof FocusManage & {
-  Input: typeof WrapInput
-  Select: typeof WrapSelect
+  Input: typeof InputFocusAdapter
+  AntdCascader: typeof AntdCascaderFocusAdapter
+  AntdSelect: typeof AntdSelectFocusAdapter
+  AntdRadio: typeof AntdRadioFocusAdapter
   Holder: typeof Holder
 }
 
 const KeyboardFocus = FocusManage as KeyboardFocusComponent
-KeyboardFocus.Input = WrapInput
-KeyboardFocus.Select = WrapSelect
+KeyboardFocus.Input = InputFocusAdapter
+KeyboardFocus.AntdSelect = AntdSelectFocusAdapter
 KeyboardFocus.Holder = Holder
+KeyboardFocus.AntdRadio = AntdRadioFocusAdapter
+KeyboardFocus.AntdRadio = AntdRadioFocusAdapter
+KeyboardFocus.AntdCascader = AntdCascaderFocusAdapter
 
 export default KeyboardFocus
