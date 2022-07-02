@@ -7,20 +7,28 @@ type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 interface InputFocusAdapterProps extends NativeInputProps {
   y: number
+  foo: string
   children: ReactElement
 }
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
-  const { y, children, ...rest } = props
+  const { y, children, foo, ...rest } = props
   const context = useFocusContext()
-  const { setPoint } = context
+  const { setPoint, forceRenderDep } = context
 
   const inputNode = useRef<HTMLInputElement>(null)
 
   const onKeyDown = useInputFocus({ ...context, y })
 
+  console.log('InputFocusAdapter', foo, y, context.xAxisIndex.current)
+
+  const x = context.xAxisIndex.current
+  const forceRender = forceRenderDep.current
+
   useEffect(() => {
+    console.log('InputFocusAdapter useEffect', foo, y, x, forceRender)
     return setPoint({
+      foo,
       y,
       trigger() {
         if (!inputNode.current) return
@@ -30,7 +38,7 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
         })
       },
     })
-  }, [setPoint, y])
+  }, [setPoint, y, x, foo, forceRender])
 
   return cloneElement<NativeInputProps>(children, {
     ...rest,

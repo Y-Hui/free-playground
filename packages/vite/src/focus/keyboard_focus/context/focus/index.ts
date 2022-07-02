@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { createContext, useContext } from 'react'
+import { createContext, MutableRefObject, useContext } from 'react'
 
 import type { VectorError } from '../../constant/error'
 
@@ -22,9 +22,9 @@ export interface SetPointOptions {
 
 export interface KeyboardFocusCtxValue {
   /**
-   * 插入坐标点
+   * 强制更新
    */
-  insertPoint: (options: Required<SetPointOptions>) => void
+  forceRenderDep: MutableRefObject<number | undefined>
   /**
    * 将坐标点转换为占位符
    */
