@@ -12,7 +12,7 @@ import { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import KeyboardFocus, { KeyboardFocusRef } from './keyboard_focus'
+import KeyboardFocus from './keyboard_focus'
 
 const { Option } = Select
 
@@ -24,7 +24,7 @@ interface Data {
 const Login: React.FC = () => {
   const [data, setData] = useState<Data[]>(() =>
     _.times(4, (key) => {
-      return { key, isEdit: true }
+      return { key, isEdit: false }
     }),
   )
 
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
         dataIndex: '00',
         title: '序号',
         width: 120,
-        render(val, row, index) {
+        render(val, row) {
           return row.key
         },
       },
@@ -96,27 +96,32 @@ const Login: React.FC = () => {
         width: 330,
         render(val, row, index) {
           return (
-            <KeyboardFocus.Holder y={index}>
-              {!row.isEdit ? null : (
-                <Form.Item name={[index, 'a3']} noStyle>
-                  <KeyboardFocus.Input y={index}>
-                    <Input style={{ width: 'auto' }} />
-                  </KeyboardFocus.Input>
-                </Form.Item>
-              )}
-              <Button
-                type="link"
-                onClick={() => {
-                  setData((rawData) => {
-                    const res = _.slice(rawData)
-                    res[index] = { ...row, isEdit: !row.isEdit }
-                    return res
-                  })
-                }}
-              >
-                Toggle
-              </Button>
-            </KeyboardFocus.Holder>
+            <Form.Item name={[index, 'a3']} noStyle>
+              <KeyboardFocus.Input y={index}>
+                <Input style={{ width: 'auto' }} />
+              </KeyboardFocus.Input>
+            </Form.Item>
+            // <KeyboardFocus.Holder y={index}>
+            //   {!row.isEdit ? null : (
+            //     <Form.Item name={[index, 'a3']} noStyle>
+            //       <KeyboardFocus.Input y={index}>
+            //         <Input style={{ width: 'auto' }} />
+            //       </KeyboardFocus.Input>
+            //     </Form.Item>
+            //   )}
+            //   <Button
+            //     type="link"
+            //     onClick={() => {
+            //       setData((rawData) => {
+            //         const res = _.slice(rawData)
+            //         res[index] = { ...row, isEdit: !row.isEdit }
+            //         return res
+            //       })
+            //     }}
+            //   >
+            //     Toggle
+            //   </Button>
+            // </KeyboardFocus.Holder>
           )
         },
       },
@@ -164,7 +169,6 @@ const Login: React.FC = () => {
               <Button
                 type="link"
                 onClick={() => {
-                  focus.current?.forceRecord()
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 0, { key: Date.now(), isEdit: false })
@@ -178,7 +182,6 @@ const Login: React.FC = () => {
                 type="link"
                 danger
                 onClick={() => {
-                  // focus.current?.forceRecord()
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 1)
@@ -196,10 +199,8 @@ const Login: React.FC = () => {
     return _.filter(result, (item): item is Item => item !== null)
   }, [show])
 
-  const focus = useRef<KeyboardFocusRef | null>(null)
-
   return (
-    <KeyboardFocus ref={focus}>
+    <KeyboardFocus>
       <Form
         onFinish={(e) => {
           console.log(e)
@@ -210,7 +211,6 @@ const Login: React.FC = () => {
         </Button>
         <Button
           onClick={() => {
-            focus.current?.forceRecord()
             setShow((v) => !v)
           }}
         >

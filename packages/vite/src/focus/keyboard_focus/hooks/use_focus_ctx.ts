@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react'
 
 import { SetPointOptions, useKeyboardFocus } from '../context/focus/index'
 import { useHolder } from '../context/holder/ctx'
+import { warn } from '../utils/warn'
 
 export interface PointOptions {
   y: number
@@ -13,7 +14,7 @@ export interface PointOptions {
 }
 
 export default function useFocusContext() {
-  const holderCtx = useHolder()
+  // const holderCtx = useHolder()
   const context = useKeyboardFocus()
   const { setPoint: setPointFn, removePoint } = context
 
@@ -21,9 +22,10 @@ export default function useFocusContext() {
 
   const setPoint = useCallback(
     (options: PointOptions) => {
-      if (holderCtx !== null) {
-        return holderCtx.setPoint(options)
-      }
+      console.log('添加坐标之前')
+      // if (holderCtx !== null) {
+      //   return holderCtx.setPoint(options)
+      // }
       console.log('添加坐标', options.y, xAxisIndex.current)
       setPointFn({
         y: options.y,
@@ -35,19 +37,19 @@ export default function useFocusContext() {
         },
       })
       return () => {
-        console.warn('删除坐标', options.y, xAxisIndex.current)
+        warn(`删除坐标, ${options.y}, ${xAxisIndex.current}`)
         if (typeof xAxisIndex.current !== 'number') return
         removePoint(xAxisIndex.current, options.y)
         xAxisIndex.current = undefined
       }
     },
-    [removePoint, setPointFn, holderCtx],
+    [removePoint, setPointFn],
   )
 
   return {
     ...context,
     setPoint,
-    // setChildrenRenderState: holderCtx?.setChildrenRenderState,
-    xAxisIndex: holderCtx?.xCoordinate || xAxisIndex,
+    // xAxisIndex: holderCtx?.xCoordinate || xAxisIndex,
+    xAxisIndex,
   }
 }

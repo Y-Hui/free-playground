@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from 'react'
 
+import { warn } from '../../utils/warn'
 import { SetPointOptions, useKeyboardFocus } from '../focus/index'
 import { HolderCtx, HolderCtxValue } from './ctx'
 
@@ -30,6 +31,15 @@ const FocusHolder: React.FC<PropsWithChildren<FocusHolderProps>> = (props) => {
 
   const xAxisIndex = useRef<number>()
   const childrenIsRendered = useRef(false)
+
+  useEffect(
+    () => () => {
+      warn('销毁', '#00f')
+    },
+    [],
+  )
+
+  console.log('=============== FocusHolder =================')
 
   const state = useMemo(() => {
     const result: HolderCtxValue = {
@@ -63,7 +73,10 @@ const FocusHolder: React.FC<PropsWithChildren<FocusHolderProps>> = (props) => {
         }
         return () => {
           result.setChildrenRenderState(false)
-          console.warn('Holder 转换坐标', options.y, xAxisIndex.current)
+          warn(
+            `Holder 转换坐标, ${options.y}, ${xAxisIndex.current}`,
+            '#ff6b6b',
+          )
           if (typeof xAxisIndex.current !== 'number') return
           // 此函数是给子元素用的，所以它不能删除坐标
           transform2Holder(xAxisIndex.current, options.y)
@@ -77,6 +90,7 @@ const FocusHolder: React.FC<PropsWithChildren<FocusHolderProps>> = (props) => {
     // 若子组件已经渲染，则不再添加占位符
     // 因为 React 的渲染顺序是子组件渲染后再渲染父组件，
     // 所以，子组件已经添加了坐标，此时便不再需要添加占位符了。
+    warn('想要添加占位符', '#ff6b6b')
     if (!childrenIsRendered.current) {
       console.log('添加占位符', y, xAxisIndex.current)
       setPointHolder({
@@ -91,13 +105,14 @@ const FocusHolder: React.FC<PropsWithChildren<FocusHolderProps>> = (props) => {
       })
     }
     return () => {
-      console.warn('想要删除占位符', y, xAxisIndex.current)
+      warn(`想要删除占位符, ${y}, ${xAxisIndex.current}`, '#ff6b6b')
       if (typeof xAxisIndex.current !== 'number') return
-      console.warn('删除占位符', y, xAxisIndex.current)
+      warn(`删除占位符, ${y}, ${xAxisIndex.current}`, '#ff6b6b')
       removePoint(xAxisIndex.current, y)
+      childrenIsRendered.current = false
       xAxisIndex.current = undefined
     }
-  }, [removePoint, setPointHolder, y])
+  })
 
   return <HolderCtx.Provider value={state}>{children}</HolderCtx.Provider>
 }
