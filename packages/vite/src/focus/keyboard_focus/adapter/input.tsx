@@ -2,6 +2,7 @@ import React, { cloneElement, ReactElement, useEffect, useRef } from 'react'
 
 import useFocusContext from '../hooks/use_focus_ctx'
 import useInputFocus from '../hooks/use_input_focus'
+// import { warn } from '../utils/warn'
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
 

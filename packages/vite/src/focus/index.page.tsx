@@ -155,7 +155,6 @@ const Login: React.FC = () => {
           )
         },
       },
-
       {
         dataIndex: '2',
         title: '下拉框',
@@ -257,7 +256,7 @@ const Login: React.FC = () => {
                 type="link"
                 danger
                 onClick={() => {
-                  // focus.current?.forceRender()
+                  focus.current?.forceRender(index)
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 1)
