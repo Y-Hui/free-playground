@@ -15,11 +15,12 @@ interface SelectFocusAdapterProps extends SelectProps {
    * y 坐标值
    */
   y: number
+  focusKey: React.Key
   children: ReactElement
 }
 
 const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
-  const { y, children, ...rest } = props
+  const { y, children, focusKey, ...rest } = props
   const context = useFocusContext()
   const {
     setPoint,
@@ -29,9 +30,8 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
     notifyTop,
     xAxisIndex,
     forceRenderDep,
+    forceRenderValue,
   } = context
-
-  const forceRender = forceRenderDep.current
 
   const selectRef = useRef<RefSelectProps>()
   // 焦点是否已经离开当前组件
@@ -39,16 +39,19 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
+  const forceRenderDepValue = forceRenderDep.current
+
   useEffect(() => {
     return setPoint({
       y,
+      focusKey,
       trigger() {
         if (!selectRef.current) return
         selectRef.current.focus()
         setOpen(true)
       },
     })
-  }, [setPoint, y, forceRender])
+  }, [setPoint, y, focusKey, forceRenderValue, forceRenderDepValue])
 
   return cloneElement<SelectFocusAdapterProps>(children, {
     ...rest,

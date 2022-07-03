@@ -5,6 +5,7 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react'
 
 import { VECTOR_ERROR } from './constant/error'
@@ -13,11 +14,12 @@ import {
   KeyboardFocusCtxValue,
   Vector,
 } from './context/focus'
-// import { warn } from './utils/warn'
+import { warn } from './utils/warn'
 import { createZombiePoint, isZombiePoint } from './utils/zombie_point'
 
 export interface KeyboardFocusRef {
   forceRender: (y?: number) => void
+  forceRender2: () => void
 }
 
 const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
@@ -27,12 +29,14 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
      * 二维笛卡尔坐标
      * 用于记录所有表单输入组件。
      */
-    const coordinates = useRef<Vector[][]>([])
+    const coordinates = useRef<(Vector | undefined | null)[][]>([])
 
+    const [forceRenderValue, setForceRenderValue] = useState(0)
     const forceRenderDep = useRef(0)
 
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
+        forceRenderValue,
         forceRenderDep,
         replacePoint(x, y, vector) {
           const yAxis = coordinates.current[y] || []
@@ -40,21 +44,32 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           coordinates.current[y] = yAxis
         },
         setPoint(options) {
-          // console.log(
-          //   '添加坐标前：',
-          //   JSON.parse(JSON.stringify(coordinates.current)),
-          // )
-          // warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
+          console.log(
+            '添加坐标前：',
+            JSON.parse(JSON.stringify(coordinates.current)),
+          )
+          warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
           const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
+          const targetIndex = _.findIndex(
+            yAxis,
+            (item) => item?.key === vector.key,
+          )
+          console.log(targetIndex)
+          if (targetIndex > -1) {
+            yAxis[targetIndex] = vector
+            vector.setXAxisValue(targetIndex)
+            coordinates.current[y] = yAxis
+            return
+          }
           if (typeof x === 'number') {
             yAxis[x] = vector
             vector.setXAxisValue(x)
           } else {
             const index = yAxis.push(vector)
-            coordinates.current[y] = yAxis
             vector.setXAxisValue(index - 1)
           }
+          coordinates.current[y] = yAxis
           console.log(
             '添加坐标结果：',
             JSON.parse(JSON.stringify(coordinates.current)),
@@ -86,7 +101,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           //   JSON.parse(JSON.stringify(coordinates.current)),
           // )
           _.forEach(coordinates.current[y], (vector, index) => {
-            vector.setXAxisValue(index)
+            vector?.setXAxisValue(index)
           })
         },
         notifyLeft(x, y) {
@@ -156,7 +171,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
         },
       }
       return result
-    }, [])
+    }, [forceRenderValue])
 
     useImperativeHandle(
       ref,
@@ -166,16 +181,35 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
             forceRenderDep.current += 1
             if (typeof y === 'number') {
               for (let i = y; i < coordinates.current.length; i += 1) {
-                _.forEach(coordinates.current[i], (vector) => {
-                  vector.setXAxisValue(undefined)
-                })
+                // _.forEach(coordinates.current[i], (vector) => {
+                //   vector.setXAxisValue(undefined)
+                // })
                 coordinates.current[i] = []
               }
               return
             }
+            coordinates.current = []
+            // coordinates.current.forEach((item) => {
+            //   _.forEach(item, (vector) => {
+            //     // vector.setXAxisValue(undefined)
+            //   })
+            // })
+          },
+          forceRender2() {
+            setForceRenderValue((v) => v + 1)
+            // forceRenderDep.current += 1
+            // if (typeof y === 'number') {
+            //   for (let i = y; i < coordinates.current.length; i += 1) {
+            //     _.forEach(coordinates.current[i], (vector) => {
+            //       vector.setXAxisValue(undefined)
+            //     })
+            //     coordinates.current[i] = []
+            //   }
+            //   return
+            // }
             coordinates.current.forEach((item) => {
               _.forEach(item, (vector) => {
-                vector.setXAxisValue(undefined)
+                vector?.setXAxisValue(undefined)
               })
             })
             coordinates.current = []

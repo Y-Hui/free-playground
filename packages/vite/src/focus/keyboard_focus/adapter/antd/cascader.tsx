@@ -15,11 +15,12 @@ interface CascaderFocusAdapterProps extends SelectProps {
    * y 坐标值
    */
   y: number
+  focusKey: React.Key
   children: ReactElement
 }
 
 const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
-  const { y, children, ...rest } = props
+  const { y, children, focusKey, ...rest } = props
   const context = useFocusContext()
   const {
     setPoint,
@@ -29,24 +30,26 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
     notifyTop,
     xAxisIndex,
     forceRenderDep,
+    forceRenderValue,
   } = context
-  const forceRender = forceRenderDep.current
 
   const selectRef = useRef<RefSelectProps>()
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)
 
   const [open, setOpen] = useState(false)
+  const forceRenderDepValue = forceRenderDep.current
 
   useEffect(() => {
     return setPoint({
       y,
+      focusKey,
       trigger() {
         if (!selectRef.current) return
         selectRef.current.focus()
       },
     })
-  }, [setPoint, y, forceRender])
+  }, [setPoint, y, focusKey, forceRenderValue, forceRenderDepValue])
 
   return cloneElement<CascaderFocusAdapterProps>(children, {
     ...rest,

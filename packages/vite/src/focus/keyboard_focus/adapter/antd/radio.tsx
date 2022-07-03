@@ -5,11 +5,12 @@ import useFocusContext from '../../hooks/use_focus_ctx'
 
 interface RadioFocusAdapterProps extends RadioProps {
   y: number
+  focusKey: React.Key
   children: ReactElement
 }
 
 const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
-  const { y, children, ...rest } = props
+  const { y, children, focusKey, ...rest } = props
   const {
     setPoint,
     notifyBottom,
@@ -18,21 +19,22 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
     notifyTop,
     xAxisIndex,
     forceRenderDep,
+    forceRenderValue,
   } = useFocusContext()
-  const forceRender = forceRenderDep.current
 
   const inputNode = useRef<HTMLInputElement>(null)
+  const forceRenderDepValue = forceRenderDep.current
 
   useEffect(() => {
     return setPoint({
       y,
+      focusKey,
       trigger() {
         if (!inputNode.current) return
         inputNode.current.focus()
-        // console.log(y, xAxisIndex.current, 'focus')
       },
     })
-  }, [setPoint, y, forceRender])
+  }, [setPoint, y, forceRenderValue, focusKey, forceRenderDepValue])
 
   return cloneElement<RadioProps>(children, {
     ...rest,

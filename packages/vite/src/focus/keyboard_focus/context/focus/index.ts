@@ -1,9 +1,10 @@
 import _ from 'lodash'
-import { createContext, MutableRefObject, useContext } from 'react'
+import React, { createContext, MutableRefObject, useContext } from 'react'
 
 import type { VectorError } from '../../constant/error'
 
 export interface Vector {
+  key: React.Key
   /**
    * 触发子组件（通知该组件表示它处于激活状态）
    */
@@ -21,11 +22,11 @@ export interface SetPointOptions {
 }
 
 export interface KeyboardFocusCtxValue {
+  forceRenderDep: MutableRefObject<number>
   /**
    * 强制更新
    */
-  forceRenderDep: MutableRefObject<number | undefined>
-  // forceRender: () => void
+  forceRenderValue: number
   /**
    * 将坐标点转换为占位符
    */
