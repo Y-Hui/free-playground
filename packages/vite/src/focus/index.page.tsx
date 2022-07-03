@@ -7,15 +7,17 @@ import {
   Modal,
   Radio,
   Select,
-  // Table,
+  Table,
 } from 'antd'
 import { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
-import KeyboardFocus, { KeyboardFocusRef } from './keyboard_focus'
+import KeyboardFocus from './keyboard_focus'
+// import RadioGroup from './keyboard_focus/adapter/antd/radio/group'
+// import Radio2 from './keyboard_focus/adapter/antd/radio/radio'
 import { warn } from './keyboard_focus/utils/warn'
-import Table from './table'
+// import Table from './table'
 
 const { Option } = Select
 
@@ -67,12 +69,10 @@ const options: Option2[] = [
 
 const Login: React.FC = () => {
   const [data, setData] = useState<Data[]>(() =>
-    _.times(300, (key) => {
+    _.times(10, (key) => {
       return { key, isEdit: false }
     }),
   )
-
-  const focus = useRef<KeyboardFocusRef>(null)
 
   const [show, setShow] = useState(true)
   const columns = useMemo(() => {
@@ -97,7 +97,7 @@ const Login: React.FC = () => {
               warn(`column: ${index} - 数字输入框`)
               return (
                 <Form.Item name={[index, 'a2']} noStyle>
-                  <KeyboardFocus.Input focusKey="数字输入框" y={index}>
+                  <KeyboardFocus.Input>
                     <InputNumber style={{ width: 100 }} keyboard={false} />
                   </KeyboardFocus.Input>
                 </Form.Item>
@@ -113,14 +113,14 @@ const Login: React.FC = () => {
           warn(`column: ${index} - 条件渲染`)
           return (
             // <Form.Item name={[index, 'a3']} noStyle>
-            //   <KeyboardFocus.Input focusKey="条件渲染" y={index}>
+            //   <KeyboardFocus.Input>
             //     <Input style={{ width: 'auto' }} />
             //   </KeyboardFocus.Input>
             // </Form.Item>
             <>
               {!row.isEdit ? null : (
                 <Form.Item name={[index, 'a3']} noStyle>
-                  <KeyboardFocus.Input focusKey="条件渲染" y={index}>
+                  <KeyboardFocus.Input>
                     <Input style={{ width: 100 }} />
                   </KeyboardFocus.Input>
                 </Form.Item>
@@ -149,7 +149,7 @@ const Login: React.FC = () => {
           warn(`column: ${index} - 文本框`)
           return (
             <Form.Item name={[index, 'a1']} noStyle>
-              <KeyboardFocus.Input focusKey="文本框" y={index}>
+              <KeyboardFocus.Input>
                 <Input />
               </KeyboardFocus.Input>
             </Form.Item>
@@ -164,10 +164,10 @@ const Login: React.FC = () => {
           warn(`column: ${index} - 下拉框`)
           return (
             <Form.Item name={[index, 'a2']} noStyle>
-              {/* <KeyboardFocus.Input y={index}>
+              {/* <KeyboardFocus.Input>
                 <InputNumber style={{ width: 100 }} keyboard={false} />
               </KeyboardFocus.Input> */}
-              <KeyboardFocus.AntdSelect focusKey="下拉框" y={index}>
+              <KeyboardFocus.AntdSelect>
                 <Select style={{ width: '100%' }}>
                   <Option value="jack">Jack</Option>
                   <Option value="lucy">Lucy</Option>
@@ -186,7 +186,7 @@ const Login: React.FC = () => {
           warn(`column: ${index} - 回车事件`)
           return (
             <Form.Item name={[index, 'a4']} noStyle>
-              <KeyboardFocus.Input focusKey="回车事件" y={index}>
+              <KeyboardFocus.Input>
                 <Input
                   placeholder="请按下回车"
                   onPressEnter={() => {
@@ -207,7 +207,7 @@ const Login: React.FC = () => {
           warn(`column: ${index} - 级联`)
           return (
             <Form.Item name={[index, 'a88']} noStyle>
-              <KeyboardFocus.AntdCascader focusKey="级联" y={index}>
+              <KeyboardFocus.AntdCascader>
                 <Cascader options={options} placeholder="Please select" />
               </KeyboardFocus.AntdCascader>
             </Form.Item>
@@ -222,12 +222,11 @@ const Login: React.FC = () => {
           return (
             <Form.Item name={[index, 'a5']} noStyle>
               <Radio.Group name={`${index}`}>
-                <KeyboardFocus.AntdRadio focusKey="单选框" y={index}>
-                  <Radio value>上架</Radio>
+                <Radio value={2}>下架</Radio>
+                <KeyboardFocus.AntdRadio>
+                  <Radio value={1}>上架</Radio>
                 </KeyboardFocus.AntdRadio>
-                <KeyboardFocus.AntdRadio focusKey="单选框2" y={index}>
-                  <Radio value={false}>下架</Radio>
-                </KeyboardFocus.AntdRadio>
+                <Radio value={3}>下架</Radio>
               </Radio.Group>
             </Form.Item>
           )
@@ -244,7 +243,6 @@ const Login: React.FC = () => {
               <Button
                 type="link"
                 onClick={() => {
-                  focus.current?.forceRender2()
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 0, { key: Date.now(), isEdit: false })
@@ -258,7 +256,6 @@ const Login: React.FC = () => {
                 type="link"
                 danger
                 onClick={() => {
-                  focus.current?.forceRender2()
                   setData((rawData) => {
                     const res = _.slice(rawData)
                     res.splice(index, 1)
@@ -277,23 +274,22 @@ const Login: React.FC = () => {
   }, [show])
 
   return (
-    <KeyboardFocus ref={focus}>
-      <Form
-        onFinish={(e) => {
-          console.log(e)
+    <Form
+      onFinish={(e) => {
+        console.log(e)
+      }}
+    >
+      <Button type="primary" htmlType="submit">
+        提交
+      </Button>
+      <Button
+        onClick={() => {
+          setShow((v) => !v)
         }}
       >
-        <Button type="primary" htmlType="submit">
-          提交
-        </Button>
-        <Button
-          onClick={() => {
-            focus.current?.forceRender2()
-            setShow((v) => !v)
-          }}
-        >
-          渲染列
-        </Button>
+        渲染列
+      </Button>
+      <KeyboardFocus.AntdTable>
         <Table
           dataSource={data}
           pagination={false}
@@ -304,8 +300,8 @@ const Login: React.FC = () => {
             x: '100vw',
           }}
         />
-      </Form>
-    </KeyboardFocus>
+      </KeyboardFocus.AntdTable>
+    </Form>
   )
 }
 

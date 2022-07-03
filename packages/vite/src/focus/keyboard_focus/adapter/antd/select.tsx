@@ -3,18 +3,22 @@ import type { RefSelectProps } from 'antd/lib/select'
 import React, { cloneElement, useEffect, useRef, useState } from 'react'
 
 import { useKeyboardFocus } from '../../context/focus'
+import { useInjectCoordinate } from '../../context/inject_coordinate'
+import isNumber from '../../utils/is_number'
 import { FocusAdapterProps } from '../type'
 
 type SelectFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
-  const { x, y, children, ...rest } = props
+  const { children, ...rest } = props
+  const [x, y] = useInjectCoordinate(props.x, props.y)
   const context = useKeyboardFocus()
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
 
   const selectRef = useRef<RefSelectProps>()
   const [open, setOpen] = useState(false)
   useEffect(() => {
+    if (!isNumber(x) || !isNumber(y)) return undefined
     return setPoint({
       x,
       y,
@@ -55,7 +59,7 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
       if (typeof event2 === 'function') {
         event2(e)
       }
-      if (typeof x !== 'number') return
+      if (!isNumber(x) || !isNumber(y)) return
       switch (e.key) {
         case 'ArrowLeft': {
           hasLeft.current = notifyLeft(x, y) === undefined

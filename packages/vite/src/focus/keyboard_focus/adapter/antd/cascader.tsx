@@ -3,12 +3,16 @@ import type { RefSelectProps } from 'antd/lib/select'
 import React, { cloneElement, useEffect, useRef, useState } from 'react'
 
 import { useKeyboardFocus } from '../../context/focus'
+import { useInjectCoordinate } from '../../context/inject_coordinate'
+import isNumber from '../../utils/is_number'
 import { FocusAdapterProps } from '../type'
 
 type CascaderFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
-  const { x, y, children, ...rest } = props
+  const { children, ...rest } = props
+  const [x, y] = useInjectCoordinate(props.x, props.y)
+
   const context = useKeyboardFocus()
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
 
@@ -19,6 +23,7 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
   const selectRef = useRef<RefSelectProps>()
 
   useEffect(() => {
+    if (!isNumber(x) || !isNumber(y)) return undefined
     return setPoint({
       x,
       y,
@@ -55,7 +60,7 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
       if (typeof event2 === 'function') {
         event2(e)
       }
-      if (typeof x !== 'number') return
+      if (!isNumber(x) || !isNumber(y)) return
       switch (e.key) {
         case 'ArrowLeft': {
           if (open) return
