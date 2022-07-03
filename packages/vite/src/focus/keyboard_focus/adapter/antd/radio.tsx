@@ -1,40 +1,30 @@
 import type { RadioProps } from 'antd'
-import React, { cloneElement, ReactElement, useEffect, useRef } from 'react'
+import React, { cloneElement, useEffect, useRef } from 'react'
 
-import useFocusContext from '../../hooks/use_focus_ctx'
+import { useKeyboardFocus } from '../../context/focus'
+import { FocusAdapterProps } from '../type'
 
-interface RadioFocusAdapterProps extends RadioProps {
-  y: number
-  focusKey: React.Key
-  children: ReactElement
-}
+type RadioFocusAdapterProps = RadioProps & FocusAdapterProps
 
 const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
-  const { y, children, focusKey, ...rest } = props
-  const {
-    setPoint,
-    notifyBottom,
-    notifyLeft,
-    notifyRight,
-    notifyTop,
-    xAxisIndex,
-    forceRenderDep,
-    forceRenderValue,
-  } = useFocusContext()
+  const { x, y, children, ...rest } = props
+  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
+    useKeyboardFocus()
 
   const inputNode = useRef<HTMLInputElement>(null)
-  const forceRenderDepValue = forceRenderDep.current
 
   useEffect(() => {
     return setPoint({
+      x,
       y,
-      focusKey,
-      trigger() {
-        if (!inputNode.current) return
-        inputNode.current.focus()
+      vector: {
+        trigger() {
+          if (!inputNode.current) return
+          inputNode.current.focus()
+        },
       },
     })
-  }, [setPoint, y, forceRenderValue, focusKey, forceRenderDepValue])
+  }, [setPoint, x, y])
 
   return cloneElement<RadioProps>(children, {
     ...rest,
@@ -46,22 +36,22 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
       const event2 = children.props?.onKeyDown
       if (typeof event1 === 'function') event1(e)
       if (typeof event2 === 'function') event2(e)
-      if (typeof xAxisIndex.current !== 'number') return
+      if (typeof x !== 'number') return
       switch (e.key) {
         case 'ArrowLeft': {
-          notifyLeft(xAxisIndex.current, y)
+          notifyLeft(x, y)
           break
         }
         case 'ArrowRight': {
-          notifyRight(xAxisIndex.current, y)
+          notifyRight(x, y)
           break
         }
         case 'ArrowUp': {
-          notifyTop(xAxisIndex.current, y)
+          notifyTop(x, y)
           break
         }
         case 'ArrowDown': {
-          notifyBottom(xAxisIndex.current, y)
+          notifyBottom(x, y)
           break
         }
         // no default

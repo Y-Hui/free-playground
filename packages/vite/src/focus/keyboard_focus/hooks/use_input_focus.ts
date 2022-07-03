@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { MutableRefObject, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import type { KeyboardFocusCtxValue } from '../context/focus'
 
@@ -8,17 +8,16 @@ interface InputFocusOptions
     KeyboardFocusCtxValue,
     'notifyRight' | 'notifyLeft' | 'notifyBottom' | 'notifyTop'
   > {
+  x: number
   y: number
-  xAxisIndex: MutableRefObject<number | undefined>
 }
 
 export default function useInputFocusState(options: InputFocusOptions) {
-  const { notifyRight, notifyLeft, notifyBottom, notifyTop, xAxisIndex, y } =
-    options
+  const { notifyRight, notifyLeft, notifyBottom, notifyTop, x, y } = options
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (typeof xAxisIndex.current !== 'number') return
+      if (typeof x !== 'number') return
       const { value } = e.currentTarget
       // 光标起始位置
       const startIndex = e.currentTarget.selectionStart || 0
@@ -29,26 +28,26 @@ export default function useInputFocusState(options: InputFocusOptions) {
       switch (e.key) {
         case 'ArrowLeft': {
           if (!notSelected || startIndex > 0) return
-          notifyLeft(xAxisIndex.current, y)
+          notifyLeft(x, y)
           break
         }
         case 'ArrowRight': {
           if (!notSelected || endIndex < _.size(value)) return
-          notifyRight(xAxisIndex.current, y)
+          notifyRight(x, y)
           break
         }
         case 'ArrowUp': {
-          notifyTop(xAxisIndex.current, y)
+          notifyTop(x, y)
           break
         }
         case 'ArrowDown': {
-          notifyBottom(xAxisIndex.current, y)
+          notifyBottom(x, y)
           break
         }
         // no default
       }
     },
-    [notifyBottom, notifyLeft, notifyRight, notifyTop, xAxisIndex, y],
+    [notifyBottom, notifyLeft, notifyRight, notifyTop, x, y],
   )
 
   return onKeyDown

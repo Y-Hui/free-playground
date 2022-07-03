@@ -1,57 +1,35 @@
 import type { SelectProps } from 'antd'
 import type { RefSelectProps } from 'antd/lib/select'
-import React, {
-  cloneElement,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { cloneElement, useEffect, useRef, useState } from 'react'
 
-import useFocusContext from '../../hooks/use_focus_ctx'
+import { useKeyboardFocus } from '../../context/focus'
+import { FocusAdapterProps } from '../type'
 
-interface SelectFocusAdapterProps extends SelectProps {
-  /**
-   * y 坐标值
-   */
-  y: number
-  focusKey: React.Key
-  children: ReactElement
-}
+type SelectFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
-  const { y, children, focusKey, ...rest } = props
-  const context = useFocusContext()
-  const {
-    setPoint,
-    notifyBottom,
-    notifyLeft,
-    notifyRight,
-    notifyTop,
-    xAxisIndex,
-    forceRenderDep,
-    forceRenderValue,
-  } = context
+  const { x, y, children, ...rest } = props
+  const context = useKeyboardFocus()
+  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
 
   const selectRef = useRef<RefSelectProps>()
-  // 焦点是否已经离开当前组件
-  const hasLeft = useRef(false)
-
   const [open, setOpen] = useState(false)
-
-  const forceRenderDepValue = forceRenderDep.current
-
   useEffect(() => {
     return setPoint({
+      x,
       y,
-      focusKey,
-      trigger() {
-        if (!selectRef.current) return
-        selectRef.current.focus()
-        setOpen(true)
+      vector: {
+        trigger() {
+          if (!selectRef.current) return
+          selectRef.current.focus()
+          setOpen(true)
+        },
       },
     })
-  }, [setPoint, y, focusKey, forceRenderValue, forceRenderDepValue])
+  }, [setPoint, x, y])
+
+  // 焦点是否已经离开当前组件
+  const hasLeft = useRef(false)
 
   return cloneElement<SelectFocusAdapterProps>(children, {
     ...rest,
@@ -77,24 +55,24 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
       if (typeof event2 === 'function') {
         event2(e)
       }
-      if (typeof xAxisIndex.current !== 'number') return
+      if (typeof x !== 'number') return
       switch (e.key) {
         case 'ArrowLeft': {
-          hasLeft.current = notifyLeft(xAxisIndex.current, y) === undefined
+          hasLeft.current = notifyLeft(x, y) === undefined
           break
         }
         case 'ArrowRight': {
-          hasLeft.current = notifyRight(xAxisIndex.current, y) === undefined
+          hasLeft.current = notifyRight(x, y) === undefined
           break
         }
         case 'ArrowUp': {
           if (open) return
-          hasLeft.current = notifyTop(xAxisIndex.current, y) === undefined
+          hasLeft.current = notifyTop(x, y) === undefined
           break
         }
         case 'ArrowDown': {
           if (open) return
-          hasLeft.current = notifyBottom(xAxisIndex.current, y) === undefined
+          hasLeft.current = notifyBottom(x, y) === undefined
           break
         }
         // no default

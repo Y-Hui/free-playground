@@ -1,54 +1,35 @@
-import React, { cloneElement, ReactElement, useEffect, useRef } from 'react'
+import React, { cloneElement, useEffect, useRef } from 'react'
 
-import useFocusContext from '../hooks/use_focus_ctx'
+import { useKeyboardFocus } from '../context/focus'
 import useInputFocus from '../hooks/use_input_focus'
-// import { warn } from '../utils/warn'
+import { FocusAdapterProps } from './type'
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
-
-interface InputFocusAdapterProps extends NativeInputProps {
-  y: number
-  focusKey: React.Key
-  children: ReactElement
-}
+type InputFocusAdapterProps = NativeInputProps & FocusAdapterProps
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
-  const { y, children, focusKey, ...rest } = props
-  const context = useFocusContext()
-  const { setPoint, forceRenderValue, forceRenderDep } = context
+  const { x, y, children, ...rest } = props
+  const context = useKeyboardFocus()
+  const { setPoint } = context
 
   const inputNode = useRef<HTMLInputElement>(null)
-
-  const onKeyDown = useInputFocus({ ...context, y })
-
-  const forceRenderDepValue = forceRenderDep.current
-
-  // console.log(
-  //   'InputFocusAdapter',
-  //   foo,
-  //   y,
-  //   context.xAxisIndex.current,
-  //   forceRender,
-  // )
   useEffect(() => {
-    // console.log(
-    //   'InputFocusAdapter useEffect',
-    //   foo,
-    //   y,
-    //   context.xAxisIndex.current,
-    // )
     return setPoint({
-      focusKey,
+      x,
       y,
-      trigger() {
-        if (!inputNode.current) return
-        inputNode.current.focus()
-        setTimeout(() => {
-          inputNode.current!.select()
-        })
+      vector: {
+        trigger() {
+          if (!inputNode.current) return
+          inputNode.current.focus()
+          setTimeout(() => {
+            inputNode.current!.select()
+          })
+        },
       },
     })
-  }, [setPoint, y, forceRenderValue, focusKey, forceRenderDepValue])
+  }, [setPoint, x, y])
+
+  const onKeyDown = useInputFocus({ ...context, x, y })
 
   return cloneElement<NativeInputProps>(children, {
     ...rest,

@@ -1,11 +1,10 @@
 import _ from 'lodash'
-import React, {
+import {
   forwardRef,
   PropsWithChildren,
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
 } from 'react'
 
 import { VECTOR_ERROR } from './constant/error'
@@ -14,12 +13,10 @@ import {
   KeyboardFocusCtxValue,
   Vector,
 } from './context/focus'
-import { warn } from './utils/warn'
 import { createZombiePoint, isZombiePoint } from './utils/zombie_point'
 
 export interface KeyboardFocusRef {
-  forceRender: (y?: number) => void
-  forceRender2: () => void
+  forceRender: () => void
 }
 
 const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
@@ -31,78 +28,20 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
      */
     const coordinates = useRef<(Vector | undefined | null)[][]>([])
 
-    const [forceRenderValue, setForceRenderValue] = useState(0)
-    const forceRenderDep = useRef(0)
-
     const state = useMemo(() => {
       const result: KeyboardFocusCtxValue = {
-        forceRenderValue,
-        forceRenderDep,
-        replacePoint(x, y, vector) {
+        setPoint(options) {
+          const { x, y, vector } = options
           const yAxis = coordinates.current[y] || []
           yAxis[x] = vector
           coordinates.current[y] = yAxis
+          return () => result.hidePoint(x, y)
         },
-        setPoint(options) {
-          console.log(
-            '添加坐标前：',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
-          warn(`setPoint 参数 ${JSON.stringify(options)}`, '#00b346')
-          const { x, y, vector } = options
-          const yAxis = coordinates.current[y] || []
-          const targetIndex = _.findIndex(
-            yAxis,
-            (item) => item?.key === vector.key,
-          )
-          console.log(targetIndex)
-          if (targetIndex > -1) {
-            yAxis[targetIndex] = vector
-            vector.setXAxisValue(targetIndex)
-            coordinates.current[y] = yAxis
-            return
-          }
-          if (typeof x === 'number') {
-            yAxis[x] = vector
-            vector.setXAxisValue(x)
-          } else {
-            const index = yAxis.push(vector)
-            vector.setXAxisValue(index - 1)
-          }
-          coordinates.current[y] = yAxis
-          console.log(
-            '添加坐标结果：',
-            JSON.parse(JSON.stringify(coordinates.current)),
-          )
-        },
-        transform2Holder(x, y) {
+        hidePoint(x, y) {
           const yAxis = coordinates.current[y] || []
           const target = yAxis[x]
           if (!target) return
           yAxis[x] = createZombiePoint(target)
-        },
-        setPointHolder(options) {
-          const { y, vector } = options
-          const yAxis = coordinates.current[y] || []
-          const index = yAxis.push(createZombiePoint(vector))
-          coordinates.current[y] = yAxis
-          vector.setXAxisValue(index - 1)
-        },
-        removePoint(x, y) {
-          // console.log(
-          //   'before Remove',
-          //   JSON.parse(JSON.stringify(coordinates.current)),
-          // )
-          const yAxis = coordinates.current[y]
-          if (!yAxis) return
-          yAxis.splice(x, 1)
-          // console.log(
-          //   'removed',
-          //   JSON.parse(JSON.stringify(coordinates.current)),
-          // )
-          _.forEach(coordinates.current[y], (vector, index) => {
-            vector?.setXAxisValue(index)
-          })
         },
         notifyLeft(x, y) {
           if (x <= 0) return VECTOR_ERROR.X_MINIMUM
@@ -110,8 +49,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
           const xIndex = x - 1
           const vector = yAxis[xIndex]
-          if (!vector) return VECTOR_ERROR.NOT_X_AXIS
-          if (isZombiePoint(vector)) {
+          if (!vector || isZombiePoint(vector)) {
             return result.notifyLeft(xIndex, y)
           }
           vector.trigger()
@@ -123,8 +61,7 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
           if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
           const xIndex = x + 1
           const vector = yAxis[xIndex]
-          if (!vector) return VECTOR_ERROR.NOT_X_AXIS
-          if (isZombiePoint(vector)) {
+          if (!vector || isZombiePoint(vector)) {
             return result.notifyRight(xIndex, y)
           }
           vector.trigger()
@@ -171,48 +108,14 @@ const KeyboardFocusContext = forwardRef<KeyboardFocusRef, PropsWithChildren>(
         },
       }
       return result
-    }, [forceRenderValue])
+    }, [])
 
     useImperativeHandle(
       ref,
       () => {
         return {
-          forceRender(y) {
-            forceRenderDep.current += 1
-            if (typeof y === 'number') {
-              for (let i = y; i < coordinates.current.length; i += 1) {
-                // _.forEach(coordinates.current[i], (vector) => {
-                //   vector.setXAxisValue(undefined)
-                // })
-                coordinates.current[i] = []
-              }
-              return
-            }
-            coordinates.current = []
-            // coordinates.current.forEach((item) => {
-            //   _.forEach(item, (vector) => {
-            //     // vector.setXAxisValue(undefined)
-            //   })
-            // })
-          },
-          forceRender2() {
-            setForceRenderValue((v) => v + 1)
-            // forceRenderDep.current += 1
-            // if (typeof y === 'number') {
-            //   for (let i = y; i < coordinates.current.length; i += 1) {
-            //     _.forEach(coordinates.current[i], (vector) => {
-            //       vector.setXAxisValue(undefined)
-            //     })
-            //     coordinates.current[i] = []
-            //   }
-            //   return
-            // }
-            coordinates.current.forEach((item) => {
-              _.forEach(item, (vector) => {
-                vector?.setXAxisValue(undefined)
-              })
-            })
-            coordinates.current = []
+          forceRender() {
+            //
           },
         }
       },
