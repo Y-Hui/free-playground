@@ -58,6 +58,10 @@
 - `KeyboardFocus.AntdCascader`
   适配 antd Cascader 组件。
   使用方法同上。
+  
+- `KeyboardFocus.AntdRadio`
+  适配 antd AntdRadio 组件。
+  使用方法同上。
 
 ### 基础 Demo
 

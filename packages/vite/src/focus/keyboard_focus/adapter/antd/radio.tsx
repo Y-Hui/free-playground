@@ -36,6 +36,8 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
     ...children.props,
     ref: inputNode,
     onKeyDown: (e) => {
+      e.preventDefault()
+      e.stopPropagation()
       const event1 = rest?.onKeyDown
       const event2 = children.props?.onKeyDown
       if (typeof event1 === 'function') event1(e)
@@ -56,6 +58,10 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
         }
         case 'ArrowDown': {
           notifyBottom(x, y)
+          break
+        }
+        case 'Enter': {
+          e.currentTarget?.click()
           break
         }
         // no default
