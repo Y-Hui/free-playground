@@ -18,3 +18,10 @@ export const VECTOR_ERROR = {
 } as const
 
 export type VectorError = ValueOf<typeof VECTOR_ERROR>
+
+export type LimitError = ValueOf<
+  Pick<
+    typeof VECTOR_ERROR,
+    'X_MAXIMUM' | 'X_MINIMUM' | 'Y_MAXIMUM' | 'Y_MINIMUM'
+  >
+>

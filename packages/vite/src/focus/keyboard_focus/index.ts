@@ -3,9 +3,12 @@ import AntdRadioFocusAdapter from './adapter/antd/radio'
 import AntdSelectFocusAdapter from './adapter/antd/select'
 import AntdTableFocusAdapter from './adapter/antd/table'
 import InputFocusAdapter from './adapter/input'
+import DistributionFocus from './distribution_focus'
 import FocusManage from './keyboard_focus_context'
 
 type KeyboardFocusComponent = typeof FocusManage & {
+  /** 焦点分发 */
+  Distribution: typeof DistributionFocus
   Input: typeof InputFocusAdapter
   AntdCascader: typeof AntdCascaderFocusAdapter
   AntdSelect: typeof AntdSelectFocusAdapter
@@ -19,4 +22,6 @@ KeyboardFocus.AntdSelect = AntdSelectFocusAdapter
 KeyboardFocus.AntdRadio = AntdRadioFocusAdapter
 KeyboardFocus.AntdCascader = AntdCascaderFocusAdapter
 KeyboardFocus.AntdTable = AntdTableFocusAdapter
+KeyboardFocus.Distribution = DistributionFocus
+
 export default KeyboardFocus

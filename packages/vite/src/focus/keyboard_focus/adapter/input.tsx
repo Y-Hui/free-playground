@@ -10,10 +10,12 @@ type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
 type InputFocusAdapterProps = NativeInputProps & FocusAdapterProps
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
-  const { children, ...rest } = props
+  const { children, foo, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
   const context = useKeyboardFocus()
   const { setPoint } = context
+
+  console.log(foo, y, x)
 
   const inputNode = useRef<HTMLInputElement>(null)
   useEffect(() => {
