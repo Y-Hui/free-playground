@@ -7,10 +7,19 @@ import isNumber from '../utils/is_number'
 import { FocusAdapterProps } from './type'
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
-type InputFocusAdapterProps = NativeInputProps & FocusAdapterProps
+type InputFocusAdapterProps = NativeInputProps &
+  FocusAdapterProps & {
+    /**
+     * 是否阻止键盘默认事件。
+     * 若不阻止默认事件，在文本框中回车时将会触发表单提交
+     *
+     * @default true
+     */
+    preventDefault?: boolean
+  }
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
-  const { children, ...rest } = props
+  const { children, preventDefault = true, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
     useKeyboardFocus()
@@ -38,6 +47,9 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
     ...children.props,
     ref: inputNode,
     onKeyDown: (e) => {
+      if (preventDefault) {
+        e.preventDefault()
+      }
       const event1 = rest?.onKeyDown
       const event2 = children.props?.onKeyDown
       if (typeof event1 === 'function') event1(e)
