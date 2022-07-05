@@ -64,22 +64,26 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
       switch (e.key) {
         case 'ArrowLeft': {
           if (open) return
-          hasLeft.current = notifyLeft(x, y) === undefined
+          hasLeft.current =
+            notifyLeft(x, y, { keySource: 'ArrowLeft' }) === undefined
           break
         }
         case 'ArrowRight': {
           if (open) return
-          hasLeft.current = notifyRight(x, y) === undefined
+          hasLeft.current =
+            notifyRight(x, y, { keySource: 'ArrowRight' }) === undefined
           break
         }
         case 'ArrowUp': {
           if (open) return
-          hasLeft.current = notifyTop(x, y) === undefined
+          hasLeft.current =
+            notifyTop(x, y, { keySource: 'ArrowUp' }) === undefined
           break
         }
         case 'ArrowDown': {
           if (open) return
-          hasLeft.current = notifyBottom(x, y) === undefined
+          hasLeft.current =
+            notifyBottom(x, y, { keySource: 'ArrowDown' }) === undefined
           break
         }
         // no default

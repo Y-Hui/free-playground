@@ -10,6 +10,10 @@ import type { VectorError } from '../../constant/error'
 export interface SubCoordinates {
   x?: number
   y?: number
+  /**
+   * 按键来源（表示用户按下的是哪一个按键才通知焦点组件）
+   */
+  keySource?: string
 }
 
 export interface Vector {
@@ -69,6 +73,13 @@ export interface KeyboardFocusCtxValue {
    */
   notifyBottom: (
     x: number,
+    y: number,
+    subCoordinates?: SubCoordinates,
+  ) => VectorError | void
+  /**
+   * 通知 x 轴最后一个组件
+   */
+  notifyXAxisLast: (
     y: number,
     subCoordinates?: SubCoordinates,
   ) => VectorError | void

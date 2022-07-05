@@ -53,20 +53,20 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
       switch (e.key) {
         case 'ArrowLeft': {
           if (!notSelected || startIndex > 0) return
-          notifyLeft(x, y)
+          notifyLeft(x, y, { keySource: 'ArrowLeft' })
           break
         }
         case 'ArrowRight': {
           if (!notSelected || endIndex < _.size(value)) return
-          notifyRight(x, y)
+          notifyRight(x, y, { keySource: 'ArrowRight' })
           break
         }
         case 'ArrowUp': {
-          notifyTop(x, y)
+          notifyTop(x, y, { keySource: 'ArrowUp' })
           break
         }
         case 'ArrowDown': {
-          notifyBottom(x, y)
+          notifyBottom(x, y, { keySource: 'ArrowDown' })
           break
         }
         // no default

@@ -45,19 +45,19 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
       if (!isNumber(x) || !isNumber(y)) return
       switch (e.key) {
         case 'ArrowLeft': {
-          notifyLeft(x, y)
+          notifyLeft(x, y, { keySource: 'ArrowLeft' })
           break
         }
         case 'ArrowRight': {
-          notifyRight(x, y)
+          notifyRight(x, y, { keySource: 'ArrowRight' })
           break
         }
         case 'ArrowUp': {
-          notifyTop(x, y)
+          notifyTop(x, y, { keySource: 'ArrowUp' })
           break
         }
         case 'ArrowDown': {
-          notifyBottom(x, y)
+          notifyBottom(x, y, { keySource: 'ArrowDown' })
           break
         }
         case 'Enter': {

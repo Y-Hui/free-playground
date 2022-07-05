@@ -34,8 +34,16 @@ const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
       y,
       vector: {
         trigger(subCoordinates) {
-          const { x: subX } = subCoordinates || {}
+          const { x: subX, keySource } = subCoordinates || {}
+          // 判断是点击左方向键触发的焦点，
+          // 则表示现在的焦点是在当前组件的右侧，则应该把焦点放在 x 轴最后一个组件
+          // 而不是第一个
+          if (keySource === 'ArrowLeft') {
+            inlineContext.current?.notifyXAxisLast(0)
+            return
+          }
           // 仅需要 x 坐标，y 坐标限制为 0
+          // 设置焦点在第一个组件上
           inlineContext.current?.notify(subX ?? 0, 0)
         },
       },

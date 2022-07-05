@@ -77,7 +77,11 @@ const KeyboardFocusContext = forwardRef<
         const xIndex = x - 1
         const vector = yAxis[xIndex]
         if (!vector) {
-          return result.notifyLeft(xIndex, y)
+          return result.notifyLeft(xIndex, y, {
+            x: xIndex,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
         }
         vector.trigger(subCoordinates)
         return undefined
@@ -92,7 +96,11 @@ const KeyboardFocusContext = forwardRef<
         const xIndex = x + 1
         const vector = yAxis[xIndex]
         if (!vector) {
-          return result.notifyRight(xIndex, y)
+          return result.notifyRight(xIndex, y, {
+            x: xIndex,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
         }
         vector.trigger(subCoordinates)
         return undefined
@@ -114,7 +122,11 @@ const KeyboardFocusContext = forwardRef<
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
         if (!vector) {
           // 坐标点向上位移一个单位
-          return result.notifyTop(x, y - 1)
+          return result.notifyTop(x, y - 1, {
+            x,
+            y: y - 1,
+            keySource: subCoordinates?.keySource,
+          })
         }
         vector.trigger(subCoordinates)
         return undefined
@@ -136,7 +148,27 @@ const KeyboardFocusContext = forwardRef<
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
         if (!vector) {
           // 坐标点向下移一个单位
-          return result.notifyBottom(x, y + 1)
+          return result.notifyBottom(x, y + 1, {
+            x,
+            y: y + 1,
+            keySource: subCoordinates?.keySource,
+          })
+        }
+        vector.trigger(subCoordinates)
+        return undefined
+      },
+      notifyXAxisLast(y, subCoordinates) {
+        // 取出对应的行
+        const yAxis = coordinates.current[y]
+        // 此行不存在
+        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
+        // 目标行中没有坐标点
+        if (_.isEmpty(yAxis)) return VECTOR_ERROR.EMPTY
+        // 目标坐标点
+        const vector = yAxis[yAxis.length - 1]
+        // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
+        if (!vector) {
+          return VECTOR_ERROR.NOT_X_AXIS
         }
         vector.trigger(subCoordinates)
         return undefined

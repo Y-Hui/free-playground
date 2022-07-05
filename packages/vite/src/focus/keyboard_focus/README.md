@@ -243,7 +243,7 @@ const NewComponent: React.VFC<NewComponentProps> (props) => {
       	// 判断不同的按键调用不同的切换焦点函数
         if(e.key === 'ArrowTop') {
           // 焦点向上移动
-          notifyTop(x, y)
+          notifyTop(x, y, { keySource: 'ArrowTop' })
         }
     	}}
     />
