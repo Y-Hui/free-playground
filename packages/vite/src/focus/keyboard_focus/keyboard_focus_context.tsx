@@ -16,7 +16,6 @@ import {
   SubCoordinates,
   Vector,
 } from './context/focus'
-import { createZombiePoint, isZombiePoint } from './utils/zombie_point'
 
 export type KeyboardFocusContextRef = KeyboardFocusCtxValue
 
@@ -68,12 +67,6 @@ const KeyboardFocusContext = forwardRef<
           coordinates.current[y] = _yAxis
         }
       },
-      hidePoint(x, y) {
-        const yAxis = coordinates.current[y] || []
-        const target = yAxis[x]
-        if (!target) return
-        yAxis[x] = createZombiePoint(target)
-      },
       notifyLeft(x, y, subCoordinates) {
         if (x <= 0) {
           handleAxisLimit(VECTOR_ERROR.X_MINIMUM, { x, y })
@@ -83,7 +76,7 @@ const KeyboardFocusContext = forwardRef<
         if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
         const xIndex = x - 1
         const vector = yAxis[xIndex]
-        if (!vector || isZombiePoint(vector)) {
+        if (!vector) {
           return result.notifyLeft(xIndex, y)
         }
         vector.trigger(subCoordinates)
@@ -98,7 +91,7 @@ const KeyboardFocusContext = forwardRef<
         if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
         const xIndex = x + 1
         const vector = yAxis[xIndex]
-        if (!vector || isZombiePoint(vector)) {
+        if (!vector) {
           return result.notifyRight(xIndex, y)
         }
         vector.trigger(subCoordinates)
@@ -119,7 +112,7 @@ const KeyboardFocusContext = forwardRef<
         // 目标坐标点
         const vector = yAxis[x]
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector || isZombiePoint(vector)) {
+        if (!vector) {
           // 坐标点向上位移一个单位
           return result.notifyTop(x, y - 1)
         }
@@ -141,7 +134,7 @@ const KeyboardFocusContext = forwardRef<
         // 目标坐标点
         const vector = yAxis[x]
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector || isZombiePoint(vector)) {
+        if (!vector) {
           // 坐标点向下移一个单位
           return result.notifyBottom(x, y + 1)
         }
@@ -158,7 +151,7 @@ const KeyboardFocusContext = forwardRef<
         // 目标坐标点
         const vector = yAxis[x]
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector || isZombiePoint(vector)) {
+        if (!vector) {
           return VECTOR_ERROR.NOT_X_AXIS
         }
         vector.trigger()

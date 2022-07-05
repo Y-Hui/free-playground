@@ -36,7 +36,6 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
     ...children.props,
     ref: inputNode,
     onKeyDown: (e) => {
-      // e.preventDefault()
       const event1 = rest?.onKeyDown
       const event2 = children.props?.onKeyDown
       if (typeof event1 === 'function') event1(e)

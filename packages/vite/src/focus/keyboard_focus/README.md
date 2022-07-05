@@ -175,13 +175,13 @@ export default () => {
                 // 在外层使用此组件即可完成焦点分发
                 <KeyboardFocus.Distribution>
                   <div style={{ display: 'flex' }}>
-                    {/* 在 KeyboardFocus.Distribution 组件内，需要手动标记 x 坐标 */}
+                    {/* 需要手动标记 x 坐标，从 0 开始标记 */}
                     <KeyboardFocus.Input x={0}>
                       <InputNumber keyboard={false} />
                     </KeyboardFocus.Input>
 
-                    {/* 标记 y 坐标是没有任何作用的，这是有意而为之的 */}
-                    <KeyboardFocus.Input y={1} x={1}>
+                    {/* 不需要标记 y 坐标，那将没有任何作用的 */}
+                    <KeyboardFocus.Input x={1}>
                       <Input />
                     </KeyboardFocus.Input>
                   </div>
@@ -198,7 +198,56 @@ export default () => {
 
 #### 为什么焦点分发时需要标记 x 坐标？为什么 y 坐标没有作用？
 
-手动标记 x 坐标其实是因为焦点分发所对应的场景是不复杂的，y 坐标没有作用也是同理。这个场景其实不应该比只有一个 y 值更加复杂的情况，若真是如此，这样的设计或许是不合理的。
+在这个场景中，实际上是缺少了在 x 轴上标记坐标的能力，而不应该考虑 y 轴。那么焦点数量应当是较少的，而不应该过于复杂，所以并没有处理坐标自动注入。
+
+此组件实际上是在一个单元格中创建了一个仅有 x 轴的坐标系（y 坐标始终为 0），因为是一个独立的坐标系，所以，在填写 x 坐标的时候需要重新开始。
+
+### 自定义组件如何适配焦点？
+
+```tsx
+interface NewComponentProps {
+  x?: number
+  y?: number
+}
+
+const NewComponent: React.VFC<NewComponentProps> (props) => {
+  // 接受自动注入的坐标
+  const [x, y] = useInjectCoordinate(props.x, props.y)
+  // 用于切换焦点的一些函数
+  const { setPoint, notifyTop, notifyBottom, notifyLeft, notifyRight } = useKeyboardFocus()
+  
+  const inputNode = useRef<HTMLInputElement>(null)
+  
+  useEffect(() => {
+    setPoint({
+      x,
+      y,
+      vector: {
+        trigger() {
+          console.log('通知此组件要设置焦点了')
+          // 设置焦点
+          inputNode.current?.focus()
+        },
+      },
+    })
+  }, [x, y, setPoint])
+  
+  return (
+    <input
+      ref={inputNode}
+      onKeyDown={(e) => {
+      	// 判断不同的按键调用不同的切换焦点函数
+        if(e.key === 'ArrowTop') {
+          // 焦点向上移动
+          notifyTop(x, y)
+        }
+    	}}
+    />
+  )
+}
+```
+
+
 
 ### 杂项
 

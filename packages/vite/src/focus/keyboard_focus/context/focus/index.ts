@@ -27,7 +27,7 @@ export interface SetPointOptions {
 
 /**
  * notify**** 函数会把当前的 x,y 坐标作为子坐标通过 onAxisLimit 传递出去。
- * 因为这个 x,y 值，仅在 DistributionFocus 组件中才有意义，因为
+ * 这个 x,y 值，仅在 DistributionFocus 组件中才有意义
  */
 export interface KeyboardFocusCtxValue {
   /**
@@ -36,10 +36,6 @@ export interface KeyboardFocusCtxValue {
    * 返回值是一个函数，用于隐藏坐标点
    */
   setPoint: (options: SetPointOptions) => () => void
-  /**
-   * 隐藏坐标点（标记为不可见，焦点切换时将直接跳过）
-   */
-  hidePoint: (x: number, y: number) => void
   /**
    * 通知对应的坐标点
    */

@@ -8,12 +8,12 @@ const InjectCoordinate = createContext<string>('[]')
 InjectCoordinate.displayName = 'InjectCoordinate'
 
 function useInjectCoordinate(x?: number, y?: number) {
-  const [injectX, injextY] = JSON.parse(useContext(InjectCoordinate)) as [
+  const [injectX, injectY] = JSON.parse(useContext(InjectCoordinate)) as [
     x?: number | null,
     y?: number | null,
   ]
 
-  return [x ?? injectX, y ?? injextY]
+  return [x ?? injectX, y ?? injectY]
 }
 
 export { InjectCoordinate, useInjectCoordinate }

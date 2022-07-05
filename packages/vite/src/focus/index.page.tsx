@@ -16,7 +16,6 @@ import React, { useMemo, useState } from 'react'
 import KeyboardFocus from './keyboard_focus'
 // import RadioGroup from './keyboard_focus/adapter/antd/radio/group'
 // import Radio2 from './keyboard_focus/adapter/antd/radio/radio'
-import { warn } from './keyboard_focus/utils/warn'
 // import Table from './table'
 
 const { Option } = Select
@@ -83,7 +82,6 @@ const Login: React.FC = () => {
       //   title: '序号',
       //   width: 120,
       //   render(val, row, index) {
-      //     // warn(`column: ${index} - 序号`)
       //     return row.key
       //   },
       // },
@@ -94,7 +92,6 @@ const Login: React.FC = () => {
             title: '数字输入框',
             width: 120,
             render(val, row, index) {
-              // warn(`column: ${index} - 数字输入框`)
               return (
                 <Form.Item name={[index, 'a2']} noStyle>
                   <KeyboardFocus.Input>
@@ -110,7 +107,6 @@ const Login: React.FC = () => {
       //   title: '条件渲染',
       //   width: 200,
       //   render(val, row, index) {
-      //     warn(`column: ${index} - 条件渲染`)
       //     return (
       //       // <Form.Item name={[index, 'a3']} noStyle>
       //       //   <KeyboardFocus.Input>
@@ -146,7 +142,6 @@ const Login: React.FC = () => {
         title: '文本框',
         width: 180,
         render(val, row, index) {
-          // warn(`column: ${index} - 文本框`)
           return (
             <KeyboardFocus.Distribution>
               <div style={{ display: 'flex' }}>
@@ -170,7 +165,6 @@ const Login: React.FC = () => {
       //   title: '下拉框',
       //   width: 140,
       //   render(val, row, index) {
-      //     warn(`column: ${index} - 下拉框`)
       //     return (
       //       <Form.Item name={[index, 'a2']} noStyle>
       //         {/* <KeyboardFocus.Input>
@@ -192,7 +186,6 @@ const Login: React.FC = () => {
       //   title: '回车事件',
       //   width: 200,
       //   render(val, row, index) {
-      //     warn(`column: ${index} - 回车事件`)
       //     return (
       //       <Form.Item name={[index, 'a4']} noStyle>
       //         <KeyboardFocus.Input>
@@ -213,7 +206,6 @@ const Login: React.FC = () => {
       //   dataIndex: '88',
       //   title: '级联',
       //   render(val, row, index) {
-      //     warn(`column: ${index} - 级联`)
       //     return (
       //       <Form.Item name={[index, 'a88']} noStyle>
       //         <KeyboardFocus.AntdCascader>
@@ -227,7 +219,6 @@ const Login: React.FC = () => {
       //   dataIndex: '5',
       //   title: '单选框',
       //   render(val, row, index) {
-      //     warn(`column: ${index} - 单选框`)
       //     return (
       //       <Form.Item name={[index, 'a5']} noStyle>
       //         <Radio.Group name={`${index}`}>
@@ -246,7 +237,6 @@ const Login: React.FC = () => {
         title: '操作',
         width: 140,
         render(val, row, index) {
-          // warn(`column: ${index} - action`)
           return (
             <>
               <Button
