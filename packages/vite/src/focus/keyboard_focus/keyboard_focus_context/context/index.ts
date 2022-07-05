@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { createContext, useContext } from 'react'
+import { createContext, MutableRefObject, useContext } from 'react'
 
 import type { VectorError } from '../../constant/error'
 
@@ -34,6 +34,10 @@ export interface SetPointOptions {
  * 这个 x,y 值，仅在 DistributionFocus 组件中才有意义
  */
 export interface KeyboardFocusCtxValue {
+  /**
+   * 坐标数据
+   */
+  coordinates: MutableRefObject<(Vector | undefined | null)[][]>
   /**
    * 设置坐标点，需要 y 坐标，x 坐标会自动生成
    *

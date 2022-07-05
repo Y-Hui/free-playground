@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
 import { VECTOR_ERROR } from '../constant/error'
@@ -38,13 +39,19 @@ const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
           // 判断是点击左方向键触发的焦点，
           // 则表示现在的焦点是在当前组件的右侧，则应该把焦点放在 x 轴最后一个组件
           // 而不是第一个
-          if (keySource === 'ArrowLeft') {
-            inlineContext.current?.notifyXAxisLast(0)
-            return
+          switch (keySource) {
+            case 'ArrowLeft':
+              inlineContext.current?.notifyXAxisLast(0)
+              return
+            case 'ArrowRight':
+              inlineContext.current?.notify(0, 0)
+              return
+            // no default
           }
           // 仅需要 x 坐标，y 坐标限制为 0
           // 设置焦点在第一个组件上
-          inlineContext.current?.notify(subX ?? 0, 0)
+          const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
+          inlineContext.current?.notify(Math.min(subX ?? 0, maxX), 0)
         },
       },
     })

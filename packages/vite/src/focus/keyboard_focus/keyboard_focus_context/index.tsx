@@ -56,6 +56,7 @@ const KeyboardFocusContext = forwardRef<
 
   const state = useMemo(() => {
     const result: KeyboardFocusCtxValue = {
+      coordinates,
       setPoint(options) {
         const { x, y, vector } = options
         const yAxis = coordinates.current[y] || []
