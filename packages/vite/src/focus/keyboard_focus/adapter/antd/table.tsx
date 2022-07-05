@@ -3,7 +3,7 @@ import type { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
 import React, { PropsWithChildren, useMemo } from 'react'
 
-import { InjectCoordinate } from '../../context/inject_coordinate'
+import { InjectCoordinate } from '../../inject_coordinate'
 import KeyboardFocusContext from '../../keyboard_focus_context'
 
 const AntdTableFocusAdapter: React.FC<PropsWithChildren> = (props) => {

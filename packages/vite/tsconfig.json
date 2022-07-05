@@ -6,6 +6,6 @@
       "@/*": ["src/*"],
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/focus/keyboard_focus/keyboard_focus_context/.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

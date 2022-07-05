@@ -9,13 +9,13 @@ import React, {
 } from 'react'
 import { useLatest } from 'react-use'
 
-import { LimitError, VECTOR_ERROR } from './constant/error'
+import { LimitError, VECTOR_ERROR } from '../constant/error'
 import {
   KeyboardFocusCtx,
   KeyboardFocusCtxValue,
   SubCoordinates,
   Vector,
-} from './context/focus'
+} from './context'
 
 export type KeyboardFocusContextRef = KeyboardFocusCtxValue
 

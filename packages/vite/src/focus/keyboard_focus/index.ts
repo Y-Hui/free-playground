@@ -24,4 +24,13 @@ KeyboardFocus.AntdCascader = AntdCascaderFocusAdapter
 KeyboardFocus.AntdTable = AntdTableFocusAdapter
 KeyboardFocus.Distribution = DistributionFocus
 
+export type { LimitError, VectorError } from './constant/error'
+export { VECTOR_ERROR } from './constant/error'
+export { InjectCoordinate, useInjectCoordinate } from './inject_coordinate'
+export type {
+  KeyboardFocusCtxValue,
+  SubCoordinates,
+  Vector,
+} from './keyboard_focus_context/context'
+export { useKeyboardFocus } from './keyboard_focus_context/context'
 export default KeyboardFocus

@@ -2,8 +2,8 @@ import type { SelectProps } from 'antd'
 import type { RefSelectProps } from 'antd/lib/select'
 import React, { cloneElement, useEffect, useRef, useState } from 'react'
 
-import { useKeyboardFocus } from '../../context/focus'
-import { useInjectCoordinate } from '../../context/inject_coordinate'
+import { useInjectCoordinate } from '../../inject_coordinate'
+import { useKeyboardFocus } from '../../keyboard_focus_context/context'
 import isNumber from '../../utils/is_number'
 import { FocusAdapterProps } from '../type'
 

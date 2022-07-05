@@ -1,15 +1,12 @@
 import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
 import { VECTOR_ERROR } from '../constant/error'
-import { useKeyboardFocus } from '../context/focus'
-import {
-  InjectCoordinate,
-  useInjectCoordinate,
-} from '../context/inject_coordinate'
+import { InjectCoordinate, useInjectCoordinate } from '../inject_coordinate'
 import KeyboardFocusContext, {
   AxisLimitHandler,
   KeyboardFocusContextRef,
 } from '../keyboard_focus_context'
+import { useKeyboardFocus } from '../keyboard_focus_context/context'
 import isNumber from '../utils/is_number'
 
 /**
