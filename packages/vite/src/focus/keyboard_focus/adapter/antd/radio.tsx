@@ -9,7 +9,7 @@ import { FocusAdapterProps } from '../type'
 type RadioFocusAdapterProps = RadioProps & FocusAdapterProps
 
 const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
-  const { children, ...rest } = props
+  const { children, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
 
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
@@ -23,15 +23,17 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
       x,
       y,
       vector: {
+        disabled,
         trigger() {
           if (!inputNode.current) return
           inputNode.current.focus()
         },
       },
     })
-  }, [setPoint, x, y])
+  }, [setPoint, x, y, disabled])
 
   return cloneElement<RadioProps>(children, {
+    disabled,
     ...rest,
     ...children.props,
     ref: inputNode,
@@ -61,7 +63,7 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
           break
         }
         case 'Enter': {
-          e.currentTarget?.click()
+          e.currentTarget?.click && e.currentTarget.click()
           break
         }
         // no default

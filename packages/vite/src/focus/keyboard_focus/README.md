@@ -5,13 +5,13 @@
 ### 前置概念
 
 > 请仔细阅读这些必要的概念，这样有助于你理解它将运行，以便你实现预期的效果 :)
+> 完整 demo 请查看 example 文件夹
 
 #### x 坐标与 y 坐标
 
 `<KeyboardFocus />` 组件使用二维笛卡尔坐标记录所有被标记的表单输入组件（下文称“焦点组件”）。
 
 - 第一行第一个单元格记为：(y0, x0)
-
 - 第一行第二个单元格记为：(y0, x1)
 - 第二行第一个单元格记为：(y1, x0)
 - 第二行第二个单元格记为：(y1, x1)
@@ -66,7 +66,7 @@
 ### 基础 Demo
 
 ```tsx
-import KeyboardFocus from './index'
+import KeyboardFocus from '@/common/components/keyboard_focus'
 
 export default () => {
   return (
@@ -106,6 +106,7 @@ export default () => {
 适配 antd Table 组件，焦点组件便可以不再传递 x, y 坐标。
 
 ```tsx
+import KeyboardFocus from '@/common/components/keyboard_focus'
 import { Table, InputNumber } from 'antd'
 
 export default () => {
@@ -152,6 +153,7 @@ export default () => {
 使用 `<KeyboardFocus.Distribution />` 组件可实现一个焦点分发给多个输入组件。
 
 ```tsx
+import KeyboardFocus from '@/common/components/keyboard_focus'
 import { Table, InputNumber } from 'antd'
 
 export default () => {
@@ -209,6 +211,8 @@ export default () => {
 ### 自定义组件如何适配焦点？
 
 ```tsx
+import { useInjectCoordinate, useKeyboardFocus } from '@/common/components/keyboard_focus'
+
 interface NewComponentProps {
   x?: number
   y?: number

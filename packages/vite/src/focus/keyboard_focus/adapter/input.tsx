@@ -10,16 +10,16 @@ type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
 type InputFocusAdapterProps = NativeInputProps &
   FocusAdapterProps & {
     /**
-     * 是否阻止键盘默认事件。
+     * 是否阻止回车键默认事件。
      * 若不阻止默认事件，在文本框中回车时将会触发表单提交
      *
      * @default true
      */
-    preventDefault?: boolean
+    pressEnterPreventDefault?: boolean
   }
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
-  const { children, preventDefault = true, ...rest } = props
+  const { children, pressEnterPreventDefault = true, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
     useKeyboardFocus()
@@ -31,6 +31,7 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
       x,
       y,
       vector: {
+        disabled,
         trigger() {
           if (!inputNode.current) return
           inputNode.current.focus()
@@ -40,16 +41,14 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
         },
       },
     })
-  }, [setPoint, x, y])
+  }, [setPoint, x, y, disabled])
 
   return cloneElement<NativeInputProps>(children, {
+    disabled,
     ...rest,
     ...children.props,
     ref: inputNode,
     onKeyDown: (e) => {
-      if (preventDefault) {
-        e.preventDefault()
-      }
       const event1 = rest?.onKeyDown
       const event2 = children.props?.onKeyDown
       if (typeof event1 === 'function') event1(e)
@@ -63,6 +62,11 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
       // 没有用鼠标框选文本
       const notSelected = startIndex === endIndex
       switch (e.key) {
+        case 'Enter': {
+          if (!pressEnterPreventDefault) return
+          e.preventDefault()
+          return
+        }
         case 'ArrowLeft': {
           if (!notSelected || startIndex > 0) return
           notifyLeft(x, y, { keySource: 'ArrowLeft' })

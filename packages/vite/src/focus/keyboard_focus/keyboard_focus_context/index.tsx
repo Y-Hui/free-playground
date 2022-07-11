@@ -70,14 +70,18 @@ const KeyboardFocusContext = forwardRef<
       },
       notifyLeft(x, y, subCoordinates) {
         if (x <= 0) {
-          handleAxisLimit(VECTOR_ERROR.X_MINIMUM, { x, y })
+          handleAxisLimit(VECTOR_ERROR.X_MINIMUM, {
+            x,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
           return VECTOR_ERROR.X_MINIMUM
         }
         const yAxis = coordinates.current[y]
         if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
         const xIndex = x - 1
         const vector = yAxis[xIndex]
-        if (!vector) {
+        if (!vector || vector?.disabled) {
           return result.notifyLeft(xIndex, y, {
             x: xIndex,
             y,
@@ -90,13 +94,17 @@ const KeyboardFocusContext = forwardRef<
       notifyRight(x, y, subCoordinates) {
         const yAxis = coordinates.current[y]
         if (x === _.size(yAxis) - 1) {
-          handleAxisLimit(VECTOR_ERROR.X_MAXIMUM, { x, y })
+          handleAxisLimit(VECTOR_ERROR.X_MAXIMUM, {
+            x,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
           return VECTOR_ERROR.X_MAXIMUM
         }
         if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
         const xIndex = x + 1
         const vector = yAxis[xIndex]
-        if (!vector) {
+        if (!vector || vector?.disabled) {
           return result.notifyRight(xIndex, y, {
             x: xIndex,
             y,
@@ -109,7 +117,11 @@ const KeyboardFocusContext = forwardRef<
       notifyTop(x, y, subCoordinates) {
         // 是否处于第一行
         if (y <= 0) {
-          handleAxisLimit(VECTOR_ERROR.Y_MINIMUM, { x, y })
+          handleAxisLimit(VECTOR_ERROR.Y_MINIMUM, {
+            x,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
           return VECTOR_ERROR.Y_MINIMUM
         }
         // 取出对应的行
@@ -121,7 +133,7 @@ const KeyboardFocusContext = forwardRef<
         // 目标坐标点
         const vector = yAxis[x]
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector) {
+        if (!vector || vector?.disabled) {
           // 坐标点向上位移一个单位
           return result.notifyTop(x, y - 1, {
             x,
@@ -135,7 +147,11 @@ const KeyboardFocusContext = forwardRef<
       notifyBottom(x, y, subCoordinates) {
         // 是否处于最后一行
         if (y === _.size(coordinates.current) - 1) {
-          handleAxisLimit(VECTOR_ERROR.Y_MAXIMUM, { x, y })
+          handleAxisLimit(VECTOR_ERROR.Y_MAXIMUM, {
+            x,
+            y,
+            keySource: subCoordinates?.keySource,
+          })
           return VECTOR_ERROR.Y_MAXIMUM
         }
         // 取出对应的行
@@ -147,7 +163,7 @@ const KeyboardFocusContext = forwardRef<
         // 目标坐标点
         const vector = yAxis[x]
         // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector) {
+        if (!vector || vector?.disabled) {
           // 坐标点向下移一个单位
           return result.notifyBottom(x, y + 1, {
             x,
@@ -171,10 +187,13 @@ const KeyboardFocusContext = forwardRef<
         if (!vector) {
           return VECTOR_ERROR.NOT_X_AXIS
         }
+        if (vector.disabled) {
+          return result.notifyLeft(yAxis.length - 1, y)
+        }
         vector.trigger(subCoordinates)
         return undefined
       },
-      notify(x, y) {
+      notify(x, y, subCoordinates) {
         // 取出对应的行
         const yAxis = coordinates.current[y]
         // 此行不存在
@@ -187,7 +206,10 @@ const KeyboardFocusContext = forwardRef<
         if (!vector) {
           return VECTOR_ERROR.NOT_X_AXIS
         }
-        vector.trigger()
+        if (vector.disabled) {
+          return VECTOR_ERROR.DISABLED
+        }
+        vector.trigger(subCoordinates)
         return undefined
       },
     }

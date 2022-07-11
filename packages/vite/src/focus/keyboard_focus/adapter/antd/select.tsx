@@ -10,7 +10,7 @@ import { FocusAdapterProps } from '../type'
 type SelectFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
-  const { children, ...rest } = props
+  const { children, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
   const context = useKeyboardFocus()
   const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
@@ -23,6 +23,7 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
       x,
       y,
       vector: {
+        disabled,
         trigger() {
           if (!selectRef.current) return
           selectRef.current.focus()
@@ -30,12 +31,13 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
         },
       },
     })
-  }, [setPoint, x, y])
+  }, [setPoint, x, y, disabled])
 
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)
 
   return cloneElement<SelectFocusAdapterProps>(children, {
+    disabled,
     ...rest,
     ...children.props,
     ref: selectRef,

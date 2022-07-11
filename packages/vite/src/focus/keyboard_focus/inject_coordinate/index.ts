@@ -9,8 +9,8 @@ InjectCoordinate.displayName = 'InjectCoordinate'
 
 function useInjectCoordinate(x?: number, y?: number) {
   const [injectX, injectY] = JSON.parse(useContext(InjectCoordinate)) as [
-    x?: number | null,
-    y?: number | null,
+    number | null, // x
+    number | null, // y
   ]
 
   return [x ?? injectX, y ?? injectY]

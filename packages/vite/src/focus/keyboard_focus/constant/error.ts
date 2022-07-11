@@ -15,6 +15,8 @@ export const VECTOR_ERROR = {
   Y_MINIMUM: 'Y_MINIMUM',
   /** 对应 Y 轴中没有坐标点 */
   EMPTY: 'EMPTY',
+  /** 对应坐标点已被禁用 */
+  DISABLED: 'DISABLED',
 } as const
 
 export type VectorError = ValueOf<typeof VECTOR_ERROR>

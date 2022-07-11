@@ -10,7 +10,7 @@ import { FocusAdapterProps } from '../type'
 type CascaderFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
-  const { children, ...rest } = props
+  const { children, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
 
   const context = useKeyboardFocus()
@@ -28,15 +28,17 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
       x,
       y,
       vector: {
+        disabled,
         trigger() {
           if (!selectRef.current) return
           selectRef.current.focus()
         },
       },
     })
-  }, [setPoint, y, x])
+  }, [setPoint, y, x, disabled])
 
   return cloneElement<CascaderFocusAdapterProps>(children, {
+    disabled,
     ...rest,
     ...children.props,
     ref: selectRef,

@@ -18,6 +18,10 @@ export interface SubCoordinates {
 
 export interface Vector {
   /**
+   * 是否禁用焦点
+   */
+  disabled?: boolean
+  /**
    * 触发子组件（通知该组件表示它处于激活状态）
    */
   trigger: (subCoordinates?: SubCoordinates) => void
@@ -47,7 +51,11 @@ export interface KeyboardFocusCtxValue {
   /**
    * 通知对应的坐标点
    */
-  notify: (x: number, y: number) => VectorError | void
+  notify: (
+    x: number,
+    y: number,
+    subCoordinates?: SubCoordinates,
+  ) => VectorError | void
   /**
    * 通知左侧的组件
    */

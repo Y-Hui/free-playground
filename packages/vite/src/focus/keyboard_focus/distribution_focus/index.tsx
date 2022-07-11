@@ -35,27 +35,42 @@ const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
       y,
       vector: {
         trigger(subCoordinates) {
+          if (!inlineContext.current) return
           const { x: subX, keySource } = subCoordinates || {}
-          // 判断是点击左方向键触发的焦点，
-          // 则表示现在的焦点是在当前组件的右侧，则应该把焦点放在 x 轴最后一个组件
-          // 而不是第一个
+          const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
+          const xIndex = Math.min(subX ?? 0, maxX)
+          // 判断由哪个按键进入此坐标轴
           switch (keySource) {
-            case 'ArrowLeft':
-              inlineContext.current?.notifyXAxisLast(0)
+            case 'ArrowLeft': {
+              inlineContext.current.notifyXAxisLast(0)
               return
-            case 'ArrowRight':
-              inlineContext.current?.notify(0, 0)
+            }
+            case 'ArrowRight': {
+              const res = inlineContext.current?.notify(0, 0)
+              if (res === VECTOR_ERROR.DISABLED) {
+                inlineContext.current.notifyRight(0, 0)
+              }
               return
+            }
+            case 'ArrowUp': {
+              const res = inlineContext.current.notify(xIndex, 0)
+              if (res === VECTOR_ERROR.DISABLED) {
+                notifyTop(x, y, subCoordinates)
+              }
+              return
+            }
+            case 'ArrowDown': {
+              const res = inlineContext.current?.notify(xIndex, 0)
+              if (res === VECTOR_ERROR.DISABLED) {
+                notifyBottom(x, y, subCoordinates)
+              }
+            }
             // no default
           }
-          // 仅需要 x 坐标，y 坐标限制为 0
-          // 设置焦点在第一个组件上
-          const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
-          inlineContext.current?.notify(Math.min(subX ?? 0, maxX), 0)
         },
       },
     })
-  }, [setPoint, x, y])
+  }, [notifyBottom, notifyTop, setPoint, x, y])
 
   const onAxisLimit: AxisLimitHandler = useCallback(
     (limitType, subCoordinates) => {
