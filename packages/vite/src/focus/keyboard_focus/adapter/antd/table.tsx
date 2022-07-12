@@ -1,10 +1,11 @@
 import type { TableProps } from 'antd'
 import type { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
-import React, { PropsWithChildren, useMemo } from 'react'
+import React, { PropsWithChildren, useMemo, useRef } from 'react'
 
 import { InjectCoordinate } from '../../inject_coordinate'
 import KeyboardFocusContext from '../../keyboard_focus_context'
+import { composeRef } from '../../utils/ref'
 
 const AntdTableFocusAdapter: React.FC<PropsWithChildren> = (props) => {
   const { children } = props
@@ -33,10 +34,17 @@ const AntdTableFocusAdapter: React.FC<PropsWithChildren> = (props) => {
     return result
   }, [rawColumns])
 
+  const container = useRef<HTMLDivElement>()
+
   return (
-    <KeyboardFocusContext>
+    <KeyboardFocusContext
+      onFocus={(x, y) => {
+        console.log(y, x)
+      }}
+    >
       {React.cloneElement<TableProps<unknown>>(children, {
         ...children.props,
+        ref: composeRef(children?.ref, container),
         columns,
       })}
     </KeyboardFocusContext>

@@ -13,7 +13,14 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
   const { children, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
   const context = useKeyboardFocus()
-  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
+  const {
+    setPoint,
+    notifyBottom,
+    notifyLeft,
+    notifyRight,
+    notifyTop,
+    onFocus,
+  } = context
 
   const selectRef = useRef<RefSelectProps>()
   const [open, setOpen] = useState(false)
@@ -26,12 +33,13 @@ const SelectFocusAdapter: React.VFC<SelectFocusAdapterProps> = (props) => {
         disabled,
         trigger() {
           if (!selectRef.current) return
+          onFocus(x, y)
           selectRef.current.focus()
           setOpen(true)
         },
       },
     })
-  }, [setPoint, x, y, disabled])
+  }, [setPoint, onFocus, x, y, disabled])
 
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)

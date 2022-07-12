@@ -4,6 +4,7 @@ import React, { cloneElement, useEffect, useRef } from 'react'
 import { useInjectCoordinate } from '../inject_coordinate'
 import { useKeyboardFocus } from '../keyboard_focus_context/context'
 import isNumber from '../utils/is_number'
+import { composeRef } from '../utils/ref'
 import { FocusAdapterProps } from './type'
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>
@@ -20,9 +21,20 @@ type InputFocusAdapterProps = NativeInputProps &
 
 const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
   const { children, pressEnterPreventDefault = true, disabled, ...rest } = props
+
+  if (!React.Children.only(children) || !React.isValidElement(children)) {
+    throw Error('InputFocusAdapter can only one child.')
+  }
+
   const [x, y] = useInjectCoordinate(props.x, props.y)
-  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
-    useKeyboardFocus()
+  const {
+    setPoint,
+    notifyBottom,
+    notifyLeft,
+    notifyRight,
+    notifyTop,
+    onFocus,
+  } = useKeyboardFocus()
 
   const inputNode = useRef<HTMLInputElement>(null)
   useEffect(() => {
@@ -34,6 +46,7 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
         disabled,
         trigger() {
           if (!inputNode.current) return
+          onFocus(x, y)
           inputNode.current.focus()
           setTimeout(() => {
             inputNode.current!.select()
@@ -41,13 +54,13 @@ const InputFocusAdapter: React.VFC<InputFocusAdapterProps> = (props) => {
         },
       },
     })
-  }, [setPoint, x, y, disabled])
+  }, [onFocus, setPoint, x, y, disabled])
 
   return cloneElement<NativeInputProps>(children, {
     disabled,
     ...rest,
     ...children.props,
-    ref: inputNode,
+    ref: composeRef(children?.ref, inputNode),
     onKeyDown: (e) => {
       const event1 = rest?.onKeyDown
       const event2 = children.props?.onKeyDown

@@ -42,6 +42,7 @@ export interface KeyboardFocusCtxValue {
    * 坐标数据
    */
   coordinates: MutableRefObject<(Vector | undefined | null)[][]>
+  onFocus: (x: number, y: number) => void
   /**
    * 设置坐标点，需要 y 坐标，x 坐标会自动生成
    *

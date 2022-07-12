@@ -12,8 +12,14 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
   const { children, disabled, ...rest } = props
   const [x, y] = useInjectCoordinate(props.x, props.y)
 
-  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } =
-    useKeyboardFocus()
+  const {
+    setPoint,
+    notifyBottom,
+    notifyLeft,
+    notifyRight,
+    notifyTop,
+    onFocus,
+  } = useKeyboardFocus()
 
   const inputNode = useRef<HTMLInputElement>(null)
 
@@ -27,10 +33,11 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
         trigger() {
           if (!inputNode.current) return
           inputNode.current.focus()
+          onFocus(x, y)
         },
       },
     })
-  }, [setPoint, x, y, disabled])
+  }, [setPoint, x, y, disabled, onFocus])
 
   return cloneElement<RadioProps>(children, {
     disabled,

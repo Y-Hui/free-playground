@@ -5,6 +5,7 @@ import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 
 // import { HashRouter } from 'react-router-dom'
+// import Content from './focus/edit'
 import Content from './focus/index.page'
 // import routes from './routes'
 

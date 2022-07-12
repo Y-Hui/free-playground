@@ -14,7 +14,14 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
   const [x, y] = useInjectCoordinate(props.x, props.y)
 
   const context = useKeyboardFocus()
-  const { setPoint, notifyBottom, notifyLeft, notifyRight, notifyTop } = context
+  const {
+    setPoint,
+    notifyBottom,
+    notifyLeft,
+    notifyRight,
+    notifyTop,
+    onFocus,
+  } = context
 
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)
@@ -31,11 +38,12 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
         disabled,
         trigger() {
           if (!selectRef.current) return
+          onFocus(x, y)
           selectRef.current.focus()
         },
       },
     })
-  }, [setPoint, y, x, disabled])
+  }, [setPoint, onFocus, y, x, disabled])
 
   return cloneElement<CascaderFocusAdapterProps>(children, {
     disabled,

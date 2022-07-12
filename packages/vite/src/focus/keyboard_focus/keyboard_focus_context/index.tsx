@@ -29,15 +29,20 @@ export interface KeyboardFocusContextProps {
    * 到达某条轴的极限（极大或极小）
    */
   onAxisLimit?: AxisLimitHandler
+  /**
+   * 设置焦点后触发
+   */
+  onFocus?: (x: number, y: number) => void
 }
 
 const KeyboardFocusContext = forwardRef<
   KeyboardFocusContextRef,
   PropsWithChildren<KeyboardFocusContextProps>
 >((props, ref) => {
-  const { onAxisLimit, children } = props
+  const { onAxisLimit, onFocus, children } = props
 
   const handleAxisLimitRef = useLatest(onAxisLimit)
+  const handleFocusRef = useLatest(onFocus)
 
   const handleAxisLimit: AxisLimitHandler = useCallback(
     (type, subCoordinates) => {
@@ -46,6 +51,13 @@ const KeyboardFocusContext = forwardRef<
       handler(type, subCoordinates)
     },
     [handleAxisLimitRef],
+  )
+
+  const handleFocus = useCallback(
+    (x: number, y: number) => {
+      handleFocusRef.current && handleFocusRef.current(x, y)
+    },
+    [handleFocusRef],
   )
 
   /**
@@ -57,6 +69,7 @@ const KeyboardFocusContext = forwardRef<
   const state = useMemo(() => {
     const result: KeyboardFocusCtxValue = {
       coordinates,
+      onFocus: handleFocus,
       setPoint(options) {
         const { x, y, vector } = options
         const yAxis = coordinates.current[y] || []
@@ -214,7 +227,7 @@ const KeyboardFocusContext = forwardRef<
       },
     }
     return result
-  }, [handleAxisLimit])
+  }, [handleAxisLimit, handleFocus])
 
   useImperativeHandle(ref, () => state, [state])
 

@@ -81,6 +81,7 @@ const Login: React.FC = () => {
         dataIndex: '00',
         title: '序号',
         width: 120,
+        fixed: 'left',
         render(val, row) {
           return row.key
         },
@@ -90,6 +91,7 @@ const Login: React.FC = () => {
         : {
             dataIndex: '1',
             title: '数字输入框',
+            fixed: 'left',
             width: 120,
             render(val, row, index) {
               return (
@@ -286,18 +288,26 @@ const Login: React.FC = () => {
       >
         渲染列
       </Button>
-      <KeyboardFocus.AntdTable>
-        <Table
-          dataSource={data}
-          pagination={false}
-          size="small"
-          columns={columns}
-          scroll={{
-            y: 300,
-            x: '100vw',
-          }}
-        />
-      </KeyboardFocus.AntdTable>
+      <button id="foo" type="button">
+        123
+      </button>
+      <div style={{ width: '70%', marginLeft: 100 }}>
+        <KeyboardFocus.AntdTable>
+          <Table
+            dataSource={data}
+            pagination={false}
+            ref={(e) => {
+              console.log(e)
+            }}
+            size="small"
+            columns={columns}
+            scroll={{
+              y: 300,
+              x: '100vw',
+            }}
+          />
+        </KeyboardFocus.AntdTable>
+      </div>
     </Form>
   )
 }

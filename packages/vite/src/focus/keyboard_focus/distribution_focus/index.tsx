@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
-import { VECTOR_ERROR } from '../constant/error'
+import { VECTOR_ERROR, VectorError } from '../constant/error'
 import { InjectCoordinate, useInjectCoordinate } from '../inject_coordinate'
 import KeyboardFocusContext, {
   AxisLimitHandler,
@@ -22,8 +22,14 @@ import isNumber from '../utils/is_number'
  */
 const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
   const { children } = props
-  const { setPoint, notifyLeft, notifyRight, notifyTop, notifyBottom } =
-    useKeyboardFocus()
+  const {
+    setPoint,
+    notifyLeft,
+    notifyRight,
+    notifyTop,
+    notifyBottom,
+    onFocus,
+  } = useKeyboardFocus()
   const [x, y] = useInjectCoordinate()
 
   const inlineContext = useRef<KeyboardFocusContextRef>(null)
@@ -39,38 +45,42 @@ const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
           const { x: subX, keySource } = subCoordinates || {}
           const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
           const xIndex = Math.min(subX ?? 0, maxX)
+          let result: VectorError | void
           // 判断由哪个按键进入此坐标轴
           switch (keySource) {
             case 'ArrowLeft': {
               inlineContext.current.notifyXAxisLast(0)
-              return
+              break
             }
             case 'ArrowRight': {
-              const res = inlineContext.current?.notify(0, 0)
-              if (res === VECTOR_ERROR.DISABLED) {
-                inlineContext.current.notifyRight(0, 0)
+              result = inlineContext.current?.notify(0, 0)
+              if (result === VECTOR_ERROR.DISABLED) {
+                result = inlineContext.current.notifyRight(0, 0)
               }
-              return
+              break
             }
             case 'ArrowUp': {
-              const res = inlineContext.current.notify(xIndex, 0)
-              if (res === VECTOR_ERROR.DISABLED) {
-                notifyTop(x, y, subCoordinates)
+              result = inlineContext.current.notify(xIndex, 0)
+              if (result === VECTOR_ERROR.DISABLED) {
+                result = notifyTop(x, y, subCoordinates)
               }
-              return
+              break
             }
             case 'ArrowDown': {
-              const res = inlineContext.current?.notify(xIndex, 0)
-              if (res === VECTOR_ERROR.DISABLED) {
-                notifyBottom(x, y, subCoordinates)
+              result = inlineContext.current?.notify(xIndex, 0)
+              if (result === VECTOR_ERROR.DISABLED) {
+                result = notifyBottom(x, y, subCoordinates)
               }
             }
             // no default
           }
+          if (result === undefined) {
+            onFocus(x, y)
+          }
         },
       },
     })
-  }, [notifyBottom, notifyTop, setPoint, x, y])
+  }, [notifyBottom, notifyTop, onFocus, setPoint, x, y])
 
   const onAxisLimit: AxisLimitHandler = useCallback(
     (limitType, subCoordinates) => {
