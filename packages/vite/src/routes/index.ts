@@ -1,9 +1,16 @@
-import { defineRoutes } from '@kit/router'
+import { defineRoutes, lazyLoad } from '@kit/router'
 
 export default defineRoutes([
   {
     path: '/',
-    component: () => null,
-    title: 'Root',
+    title: 'Focus',
+    // redirectTo: '/basic',
+    component: () => lazyLoad(() => import('@/focus/example/index')),
+    // routes: [
+    //   {
+    //     path: '/basic',
+    //     component: () => lazyLoad(() => import('@/focus/example/basic')),
+    //   },
+    // ],
   },
 ])

@@ -1,8 +1,14 @@
-import { composeRef } from '@/common/util/ref'
 import type { TableProps } from 'antd'
 import type { ColumnsType } from 'antd/lib/table/interface'
 import _ from 'lodash'
-import React, { FunctionComponentElement, useMemo, useRef } from 'react'
+import React, {
+  FunctionComponentElement,
+  PropsWithChildren,
+  useMemo,
+  useRef,
+} from 'react'
+
+import { composeRef } from '@/common/util/ref'
 
 import { InjectCoordinate } from '../../inject_coordinate'
 import KeyboardFocusContext, {
@@ -27,7 +33,9 @@ function getValue<T>(value: T | (() => T)) {
   return value
 }
 
-const AntdTableFocusAdapter: React.FC<AntdTableFocusAdapterProps> = (props) => {
+const AntdTableFocusAdapter: React.FC<
+  PropsWithChildren<AntdTableFocusAdapterProps>
+> = (props) => {
   const {
     leftFixedWidth = 0,
     rightFixedWidth = 0,

@@ -28,14 +28,14 @@ export type { LimitError, VectorError } from './constant/error'
 export { VECTOR_ERROR } from './constant/error'
 export { InjectCoordinate, useInjectCoordinate } from './inject_coordinate'
 export type { KeyboardFocusCtxValue } from './keyboard_focus_context/context'
+export { useKeyboardFocus } from './keyboard_focus_context/context'
 export type {
-  Vector,
-  SubCoordinates,
-  UnsafeVector,
-  DispatchFn,
-  DispatchOptions,
   Coordinates,
   Ctx,
+  DispatchFn,
+  DispatchOptions,
+  SubCoordinates,
+  UnsafeVector,
+  Vector,
 } from './types'
-export { useKeyboardFocus } from './keyboard_focus_context/context'
 export default KeyboardFocus

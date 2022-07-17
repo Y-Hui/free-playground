@@ -1,34 +1,31 @@
 import 'antd/dist/antd.css'
 
-// import { RouterView } from '@kit/router'
 import type { FC } from 'react'
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 
-// import { HashRouter } from 'react-router-dom'
-// import Content from './focus/edit'
-import Content from './focus/index.page'
-// import routes from './routes'
-
-const Count = () => {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    console.log('mount', count)
-    return () => {
-      console.log('unmount', count)
-    }
-  }, [count])
-  return <button onClick={() => setCount((v) => v + 1)}>{count}</button>
-}
+import Basic from '@/focus/example/basic'
+import Focus from '@/focus/example/index'
+import BasicTable from '@/focus/example/table/basic'
+import ComplexTable from '@/focus/example/table/index'
 
 const App: FC = () => {
   return (
-    <>
-      {/* <Count /> */}
-      <Content />
-    </>
-    // <HashRouter>
-    //   <RouterView routes={routes} />
-    // </HashRouter>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Focus>
+              <Outlet />
+            </Focus>
+          }
+        >
+          <Route path="basic" element={<Basic />} />
+          <Route path="basic-table" element={<BasicTable />} />
+          <Route path="complex-table" element={<ComplexTable />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 

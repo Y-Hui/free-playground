@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
 import { VECTOR_ERROR } from '../constant/error'
 import { InjectCoordinate, useInjectCoordinate } from '../inject_coordinate'
@@ -25,7 +25,9 @@ interface DistributionFocusProps {
  * 在一个单元格内，维护一套焦点管理系统，可以类比为现实生活中的 “路由器”。
  * 注意：在本组内通知其他焦点组件时会将 y 轴永远强制为 0。
  */
-const DistributionFocus: React.FC<DistributionFocusProps> = (props) => {
+const DistributionFocus: React.FC<PropsWithChildren<DistributionFocusProps>> = (
+  props,
+) => {
   const { x: rawX, y: rawY, children } = props
   const { setPoint, dispatch } = useKeyboardFocus()
   const [x, y] = useInjectCoordinate(rawX, rawY)
@@ -64,7 +66,7 @@ const DistributionFocus: React.FC<DistributionFocusProps> = (props) => {
             dispatch({
               currentX: x,
               currentY: y,
-              keyName: keyName,
+              keyName,
               subX: fromX,
               subY,
               type,
@@ -127,7 +129,7 @@ const DistributionFocus: React.FC<DistributionFocusProps> = (props) => {
   )
 
   return (
-    <InjectCoordinate.Provider value='[null, 0]'>
+    <InjectCoordinate.Provider value="[null, 0]">
       <KeyboardFocusContext ref={inlineContext} onError={onError}>
         {children}
       </KeyboardFocusContext>
