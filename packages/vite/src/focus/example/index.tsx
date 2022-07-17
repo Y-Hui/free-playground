@@ -15,6 +15,9 @@ const FocusDemo: FC<PropsWithChildren> = (props) => {
         <Link className="underline" to="/complex-table">
           Complex Table
         </Link>
+        <Link className="underline" to="/basic-form">
+          Form
+        </Link>
       </nav>
       {children}
     </div>

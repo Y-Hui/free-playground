@@ -1,5 +1,11 @@
 import _ from 'lodash'
-import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 
 import { VECTOR_ERROR } from '../constant/error'
 import { InjectCoordinate, useInjectCoordinate } from '../inject_coordinate'
@@ -13,6 +19,12 @@ import { isNumber } from '../utils'
 interface DistributionFocusProps {
   x?: number
   y?: number
+  /**
+   * 自定义模式
+   *
+   * @default "x"
+   */
+  mode?: 'x' | 'y'
 }
 
 /**
@@ -28,17 +40,16 @@ interface DistributionFocusProps {
 const DistributionFocus: React.FC<PropsWithChildren<DistributionFocusProps>> = (
   props,
 ) => {
-  const { x: rawX, y: rawY, children } = props
+  const { x: rawX, y: rawY, mode = 'x', children } = props
   const { setPoint, dispatch } = useKeyboardFocus()
   const [x, y] = useInjectCoordinate(rawX, rawY)
 
   const inlineContext = useRef<KeyboardFocusContextRef>(null)
 
   const checkDisabledAll = useCallback(() => {
-    return _.every(
-      inlineContext.current?.coordinates.current[0],
-      (item) => !item || item.disabled,
-    )
+    return _.every(inlineContext.current?.coordinates.current, (row) => {
+      return row.every((item) => !item || item.disabled)
+    })
   }, [])
 
   const removePoint = useRef<() => void>()
@@ -74,6 +85,7 @@ const DistributionFocus: React.FC<PropsWithChildren<DistributionFocusProps>> = (
             return
           }
           const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
+          // const maxY = _.size(inlineContext.current?.coordinates.current) - 1
           const xIndex = Math.min(fromX ?? 0, maxX)
 
           // 判断由哪个按键进入此坐标轴
@@ -87,19 +99,41 @@ const DistributionFocus: React.FC<PropsWithChildren<DistributionFocusProps>> = (
               break
             }
             case 'ArrowUp': {
-              inlineContext.current.notify(xIndex, 0, focusFrom)
+              if (mode === 'y') {
+                // 跳到 y 轴最后一个
+                inlineContext.current.notifyYLast(0, focusFrom)
+              } else {
+                inlineContext.current.notify(xIndex, 0, focusFrom)
+              }
               break
             }
             case 'ArrowDown': {
-              inlineContext.current.notify(xIndex, 0, focusFrom)
+              if (mode === 'y') {
+                // 跳到 y 轴第一个
+                inlineContext.current.notifyYFirst(0, focusFrom)
+              } else {
+                inlineContext.current.notify(xIndex, 0, focusFrom)
+              }
               break
             }
+            /*
+                        case 'ArrowUp': {
+              // 跳到 y 轴最后一个
+              inlineContext.current.notifyFirst(maxY, focusFrom)
+              break
+            }
+            case 'ArrowDown': {
+              inlineContext.current.notifyFirst(0, focusFrom)
+              // inlineContext.current.notify(xIndex, 0, focusFrom)
+              break
+            }
+            */
             // no default
           }
         },
       },
     })
-  }, [checkDisabledAll, dispatch, setPoint, x, y])
+  }, [checkDisabledAll, dispatch, setPoint, x, y, mode])
 
   const onError: ErrorHandler = useCallback(
     (error, focusFrom) => {
@@ -128,8 +162,19 @@ const DistributionFocus: React.FC<PropsWithChildren<DistributionFocusProps>> = (
     [dispatch, x, y],
   )
 
+  const injectValue = useMemo(() => {
+    switch (mode) {
+      case 'y':
+        return '[0, null]'
+      case 'x':
+        return '[null, 0]'
+      default:
+        return '[]'
+    }
+  }, [mode])
+
   return (
-    <InjectCoordinate.Provider value="[null, 0]">
+    <InjectCoordinate.Provider value={injectValue}>
       <KeyboardFocusContext ref={inlineContext} onError={onError}>
         {children}
       </KeyboardFocusContext>

@@ -10,18 +10,24 @@ import React, {
 import { useLatest } from 'react-use'
 
 import { VectorError } from '../constant/error'
-import { KeyboardFocusCtx, KeyboardFocusCtxValue } from './context'
+import normalDispatch from '../dispatch_strategy'
 import {
   Coordinates,
-  FocusFrom,
   DispatchFn,
+  FocusFrom,
   FocusVectorOptions,
 } from '../types'
-import normalDispatch from '../dispatch_strategy'
-import { getVector, getFirstVector, getLastVector } from '../utils'
+import {
+  getFirstVector,
+  getLastVector,
+  getVector,
+  getYFirstVector,
+  getYLastVector,
+} from '../utils'
+import { KeyboardFocusCtx, KeyboardFocusCtxValue } from './context'
 
 export type KeyboardFocusContextRef = KeyboardFocusCtxValue
-export type ErrorHandler = (type: VectorError, focusForm: FocusFrom) => void
+export type ErrorHandler = (type: VectorError, focusFrom: FocusFrom) => void
 export type FocusedHandler = (x: number, y: number) => void
 
 export interface KeyboardFocusContextProps {
@@ -131,7 +137,7 @@ const KeyboardFocusContext = forwardRef<
           blurFnMap.delete(`${x},${y}`)
         }
       },
-      notifyXAxisLast(y, focusForm) {
+      notifyXAxisLast(y, focusFrom) {
         const {
           err,
           x: targetX,
@@ -139,17 +145,17 @@ const KeyboardFocusContext = forwardRef<
           value,
         } = getLastVector(coordinates.current, y)
         if (err) {
-          handleError(err, focusForm)
+          handleError(err, focusFrom)
           return
         }
         onFocus({
           x: targetX,
           y: targetY,
           vector: value,
-          from: focusForm,
+          from: focusFrom,
         })
       },
-      notify(x, y, focusForm) {
+      notify(x, y, focusFrom) {
         const {
           err,
           x: targetX,
@@ -157,17 +163,17 @@ const KeyboardFocusContext = forwardRef<
           value,
         } = getVector(coordinates.current, x, y)
         if (err) {
-          handleError(err, focusForm)
+          handleError(err, focusFrom)
           return
         }
         onFocus({
           x: targetX,
           y: targetY,
           vector: value,
-          from: focusForm,
+          from: focusFrom,
         })
       },
-      notifyFirst(y, focusForm) {
+      notifyFirst(y, focusFrom) {
         const {
           err,
           x: targetX,
@@ -175,14 +181,50 @@ const KeyboardFocusContext = forwardRef<
           value,
         } = getFirstVector(coordinates.current, y)
         if (err) {
-          handleError(err, focusForm)
+          handleError(err, focusFrom)
           return
         }
         onFocus({
           x: targetX,
           y: targetY,
           vector: value,
-          from: focusForm,
+          from: focusFrom,
+        })
+      },
+      notifyYFirst(x, focusFrom) {
+        const {
+          err,
+          x: targetX,
+          y: targetY,
+          value,
+        } = getYFirstVector(coordinates.current, x)
+        if (err) {
+          handleError(err, focusFrom)
+          return
+        }
+        onFocus({
+          x: targetX,
+          y: targetY,
+          vector: value,
+          from: focusFrom,
+        })
+      },
+      notifyYLast(x, focusFrom) {
+        const {
+          err,
+          x: targetX,
+          y: targetY,
+          value,
+        } = getYLastVector(coordinates.current, x)
+        if (err) {
+          handleError(err, focusFrom)
+          return
+        }
+        onFocus({
+          x: targetX,
+          y: targetY,
+          vector: value,
+          from: focusFrom,
         })
       },
       onFocused: handleFocused,

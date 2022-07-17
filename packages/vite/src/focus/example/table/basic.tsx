@@ -60,7 +60,9 @@ const TableDemo: FC = () => {
       title: '年龄',
       width: 160,
       render(val) {
-        return <InputNumber style={{ width: '100%' }} value={val} />
+        return (
+          <InputNumber style={{ width: '100%' }} keyboard={false} value={val} />
+        )
       },
     },
     {
@@ -76,7 +78,9 @@ const TableDemo: FC = () => {
       title: '身高',
       width: 160,
       render(val) {
-        return <InputNumber style={{ width: '100%' }} value={val} />
+        return (
+          <InputNumber style={{ width: '100%' }} keyboard={false} value={val} />
+        )
       },
     },
     {

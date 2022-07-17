@@ -3,9 +3,9 @@ import { createContext, MutableRefObject, useContext } from 'react'
 
 import {
   DispatchOptions,
-  Vector,
-  FocusVectorOptions,
   FocusFrom,
+  FocusVectorOptions,
+  Vector,
 } from '../../types'
 
 export interface SetPointOptions {
@@ -41,6 +41,14 @@ export interface KeyboardFocusCtxValue {
    * 通知 x 轴第一个组件
    */
   notifyFirst: (y: number, focusFrom: FocusFrom) => void
+  /**
+   * 通知 x 坐标上 y 轴第一个可用坐标
+   */
+  notifyYFirst: (x: number, focusFrom: FocusFrom) => void
+  /**
+   * 通知 x 坐标上 y 轴最后一个可用坐标
+   */
+  notifyYLast: (x: number, focusFrom: FocusFrom) => void
   /**
    * 当一个组件处于焦点后触发
    */

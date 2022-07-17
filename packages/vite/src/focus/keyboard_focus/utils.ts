@@ -1,6 +1,7 @@
 import _ from 'lodash'
+
+import { VECTOR_ERROR, VectorError } from './constant/error'
 import type { Coordinates, Vector } from './types'
-import { VectorError, VECTOR_ERROR } from './constant/error'
 
 export function isNumber(value?: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value)
@@ -171,4 +172,33 @@ export function getLastVector(coordinates: Coordinates, y: number) {
     return getLeftVector(coordinates, xIndex, y)
   }
   return { value: vector, x: xIndex, y }
+}
+
+/**
+ * 获取 x 坐标上 y 轴第一个可用坐标
+ */
+export function getYFirstVector(coordinates: Coordinates, x: number) {
+  const vector = coordinates[0][x]
+  if (!vector || vector?.disabled) {
+    return getBottomVector(coordinates, x, 0)
+  }
+  return { value: vector, x, y: 0 }
+}
+
+/**
+ * 获取 x 坐标上 y 轴最后一个可用坐标
+ */
+export function getYLastVector(coordinates: Coordinates, x: number) {
+  const errVal: InvalidVal = { x, y: -1, err: VECTOR_ERROR.NOT_X_AXIS }
+  const maxYIndex = _.size(coordinates) - 1
+  if (maxYIndex < 0) {
+    errVal.err = VECTOR_ERROR.NOT_Y_AXIS
+    return errVal
+  }
+  const yAxis = coordinates[maxYIndex]
+  const vector = yAxis[x]
+  if (!vector || vector.disabled) {
+    return getTopVector(coordinates, x, maxYIndex)
+  }
+  return { value: vector, x, y: maxYIndex }
 }
