@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React, {
   forwardRef,
   PropsWithChildren,
@@ -6,228 +5,191 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react'
 import { useLatest } from 'react-use'
 
-import { LimitError, VECTOR_ERROR } from '../constant/error'
+import { VectorError } from '../constant/error'
+import { KeyboardFocusCtx, KeyboardFocusCtxValue } from './context'
 import {
-  KeyboardFocusCtx,
-  KeyboardFocusCtxValue,
-  SubCoordinates,
-  Vector,
-} from './context'
+  Coordinates,
+  FocusFrom,
+  DispatchFn,
+  FocusVectorOptions,
+} from '../types'
+import normalDispatch from '../dispatch_strategy'
+import { getVector, getFirstVector, getLastVector } from '../utils'
 
 export type KeyboardFocusContextRef = KeyboardFocusCtxValue
-
-export type AxisLimitHandler = (
-  type: LimitError,
-  subCoordinates?: SubCoordinates,
-) => void
+export type ErrorHandler = (type: VectorError, focusForm: FocusFrom) => void
+export type FocusedHandler = (x: number, y: number) => void
 
 export interface KeyboardFocusContextProps {
   /**
-   * 到达某条轴的极限（极大或极小）
+   * 焦点调度策略
    */
-  onAxisLimit?: AxisLimitHandler
+  dispatch?: DispatchFn
   /**
-   * 设置焦点后触发
+   * 错误处理
    */
-  onFocus?: (x: number, y: number) => void
+  onError?: ErrorHandler
+  /**
+   * 当一个组件处于焦点后触发 (仅支持由方向键触发的焦点，而不是使用鼠标、tab 键触发的焦点)
+   */
+  onFocused?: FocusedHandler
 }
 
 const KeyboardFocusContext = forwardRef<
   KeyboardFocusContextRef,
   PropsWithChildren<KeyboardFocusContextProps>
 >((props, ref) => {
-  const { onAxisLimit, onFocus, children } = props
+  const { onError, onFocused, dispatch = normalDispatch, children } = props
 
-  const handleAxisLimitRef = useLatest(onAxisLimit)
-  const handleFocusRef = useLatest(onFocus)
+  const schedule = useLatest(dispatch)
 
-  const handleAxisLimit: AxisLimitHandler = useCallback(
-    (type, subCoordinates) => {
-      const handler = handleAxisLimitRef.current
+  const handleErrorRef = useLatest(onError)
+  const handleError: ErrorHandler = useCallback(
+    (type, focusFrom) => {
+      const handler = handleErrorRef.current
       if (typeof handler !== 'function') return
-      handler(type, subCoordinates)
+      handler(type, focusFrom)
     },
-    [handleAxisLimitRef],
+    [handleErrorRef],
   )
 
-  const handleFocus = useCallback(
-    (x: number, y: number) => {
-      handleFocusRef.current && handleFocusRef.current(x, y)
+  const handleFocusedRef = useLatest(onFocused)
+  const handleFocused: FocusedHandler = useCallback(
+    (x, y) => {
+      const handler = handleFocusedRef.current
+      if (typeof handler !== 'function') return
+      handler(x, y)
     },
-    [handleFocusRef],
+    [handleFocusedRef],
   )
 
   /**
    * 二维笛卡尔坐标
    * 用于记录所有表单输入组件。
    */
-  const coordinates = useRef<(Vector | undefined | null)[][]>([])
+  const coordinates = useRef<Coordinates>([])
+  /**
+   * key 为 x,y
+   * value 为函数
+   */
+  const [blurFnMap] = useState(
+    () => new Map<string, (() => void) | undefined>(),
+  )
+
+  const onBlur = useCallback(
+    (skipX?: number, skipY?: number) => {
+      const skipKey = `${skipX},${skipY}`
+      const isValid = typeof skipX === 'number' && typeof skipY === 'number'
+      blurFnMap.forEach((blur, key) => {
+        if (isValid && skipKey === key) return
+        blur && blur()
+      })
+    },
+    [blurFnMap],
+  )
+
+  const onFocus = useCallback(
+    (options: FocusVectorOptions) => {
+      const { x, y, vector, from } = options
+      onBlur(x, y)
+      vector.trigger(from)
+      handleFocused(x, y)
+    },
+    [handleFocused, onBlur],
+  )
 
   const state = useMemo(() => {
     const result: KeyboardFocusCtxValue = {
       coordinates,
-      onFocus: handleFocus,
+      focusVector: onFocus,
+      dispatch(opts) {
+        schedule.current(
+          {
+            coordinates: coordinates.current,
+            focus: onFocus,
+            throwError(options) {
+              handleError(options.error, options.from)
+            },
+          },
+          opts,
+        )
+      },
       setPoint(options) {
         const { x, y, vector } = options
         const yAxis = coordinates.current[y] || []
         yAxis[x] = vector
         coordinates.current[y] = yAxis
+        blurFnMap.set(`${x},${y}`, vector.blur)
         return () => {
           const _yAxis = coordinates.current[y] || []
           _yAxis[x] = undefined
           coordinates.current[y] = _yAxis
+          blurFnMap.delete(`${x},${y}`)
         }
       },
-      notifyLeft(x, y, subCoordinates) {
-        if (x <= 0) {
-          handleAxisLimit(VECTOR_ERROR.X_MINIMUM, {
-            x,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-          return VECTOR_ERROR.X_MINIMUM
+      notifyXAxisLast(y, focusForm) {
+        const {
+          err,
+          x: targetX,
+          y: targetY,
+          value,
+        } = getLastVector(coordinates.current, y)
+        if (err) {
+          handleError(err, focusForm)
+          return
         }
-        const yAxis = coordinates.current[y]
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        const xIndex = x - 1
-        const vector = yAxis[xIndex]
-        if (!vector || vector?.disabled) {
-          return result.notifyLeft(xIndex, y, {
-            x: xIndex,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-        }
-        vector.trigger(subCoordinates)
-        return undefined
+        onFocus({
+          x: targetX,
+          y: targetY,
+          vector: value,
+          from: focusForm,
+        })
       },
-      notifyRight(x, y, subCoordinates) {
-        const yAxis = coordinates.current[y]
-        if (x === _.size(yAxis) - 1) {
-          handleAxisLimit(VECTOR_ERROR.X_MAXIMUM, {
-            x,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-          return VECTOR_ERROR.X_MAXIMUM
+      notify(x, y, focusForm) {
+        const {
+          err,
+          x: targetX,
+          y: targetY,
+          value,
+        } = getVector(coordinates.current, x, y)
+        if (err) {
+          handleError(err, focusForm)
+          return
         }
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        const xIndex = x + 1
-        const vector = yAxis[xIndex]
-        if (!vector || vector?.disabled) {
-          return result.notifyRight(xIndex, y, {
-            x: xIndex,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-        }
-        vector.trigger(subCoordinates)
-        return undefined
+        onFocus({
+          x: targetX,
+          y: targetY,
+          vector: value,
+          from: focusForm,
+        })
       },
-      notifyTop(x, y, subCoordinates) {
-        // 是否处于第一行
-        if (y <= 0) {
-          handleAxisLimit(VECTOR_ERROR.Y_MINIMUM, {
-            x,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-          return VECTOR_ERROR.Y_MINIMUM
+      notifyFirst(y, focusForm) {
+        const {
+          err,
+          x: targetX,
+          y: targetY,
+          value,
+        } = getFirstVector(coordinates.current, y)
+        if (err) {
+          handleError(err, focusForm)
+          return
         }
-        // 取出对应的行
-        const yAxis = coordinates.current[y - 1]
-        // 此行不存在
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        // 目标行中没有坐标点
-        if (_.isEmpty(yAxis)) return VECTOR_ERROR.EMPTY
-        // 目标坐标点
-        const vector = yAxis[x]
-        // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector || vector?.disabled) {
-          // 坐标点向上位移一个单位
-          return result.notifyTop(x, y - 1, {
-            x,
-            y: y - 1,
-            keySource: subCoordinates?.keySource,
-          })
-        }
-        vector.trigger(subCoordinates)
-        return undefined
+        onFocus({
+          x: targetX,
+          y: targetY,
+          vector: value,
+          from: focusForm,
+        })
       },
-      notifyBottom(x, y, subCoordinates) {
-        // 是否处于最后一行
-        if (y === _.size(coordinates.current) - 1) {
-          handleAxisLimit(VECTOR_ERROR.Y_MAXIMUM, {
-            x,
-            y,
-            keySource: subCoordinates?.keySource,
-          })
-          return VECTOR_ERROR.Y_MAXIMUM
-        }
-        // 取出对应的行
-        const yAxis = coordinates.current[y + 1]
-        // 此行不存在
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        // 目标行中没有坐标点
-        if (_.isEmpty(yAxis)) return VECTOR_ERROR.EMPTY
-        // 目标坐标点
-        const vector = yAxis[x]
-        // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector || vector?.disabled) {
-          // 坐标点向下移一个单位
-          return result.notifyBottom(x, y + 1, {
-            x,
-            y: y + 1,
-            keySource: subCoordinates?.keySource,
-          })
-        }
-        vector.trigger(subCoordinates)
-        return undefined
-      },
-      notifyXAxisLast(y, subCoordinates) {
-        // 取出对应的行
-        const yAxis = coordinates.current[y]
-        // 此行不存在
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        // 目标行中没有坐标点
-        if (_.isEmpty(yAxis)) return VECTOR_ERROR.EMPTY
-        // 目标坐标点
-        const vector = yAxis[yAxis.length - 1]
-        // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector) {
-          return VECTOR_ERROR.NOT_X_AXIS
-        }
-        if (vector.disabled) {
-          return result.notifyLeft(yAxis.length - 1, y)
-        }
-        vector.trigger(subCoordinates)
-        return undefined
-      },
-      notify(x, y, subCoordinates) {
-        // 取出对应的行
-        const yAxis = coordinates.current[y]
-        // 此行不存在
-        if (!yAxis) return VECTOR_ERROR.NOT_Y_AXIS
-        // 目标行中没有坐标点
-        if (_.isEmpty(yAxis)) return VECTOR_ERROR.EMPTY
-        // 目标坐标点
-        const vector = yAxis[x]
-        // 对应坐标点为 undefined（通常为坐标不对齐导致，比如第一行三个，第二行两个）
-        if (!vector) {
-          return VECTOR_ERROR.NOT_X_AXIS
-        }
-        if (vector.disabled) {
-          return VECTOR_ERROR.DISABLED
-        }
-        vector.trigger(subCoordinates)
-        return undefined
-      },
+      onFocused: handleFocused,
+      triggerBlur: () => onBlur(),
     }
     return result
-  }, [handleAxisLimit, handleFocus])
+  }, [blurFnMap, handleError, handleFocused, onBlur, onFocus, schedule])
 
   useImperativeHandle(ref, () => state, [state])
 
@@ -238,6 +200,6 @@ const KeyboardFocusContext = forwardRef<
   )
 })
 
-KeyboardFocusContext.displayName = 'KeyboardFocusContext'
+KeyboardFocusContext.displayName = 'KeyboardFocus'
 
 export default KeyboardFocusContext

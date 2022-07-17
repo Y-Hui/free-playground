@@ -1,49 +1,66 @@
 import type { RadioProps } from 'antd'
-import React, { cloneElement, useEffect, useRef } from 'react'
+import React, {
+  cloneElement,
+  FunctionComponentElement,
+  useEffect,
+  useRef,
+} from 'react'
+
+import { composeRef } from '@/common/util/ref'
 
 import { useInjectCoordinate } from '../../inject_coordinate'
 import { useKeyboardFocus } from '../../keyboard_focus_context/context'
-import isNumber from '../../utils/is_number'
+import { isNumber } from '../../utils'
 import { FocusAdapterProps } from '../type'
 
 type RadioFocusAdapterProps = RadioProps & FocusAdapterProps
 
 const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
-  const { children, disabled, ...rest } = props
-  const [x, y] = useInjectCoordinate(props.x, props.y)
+  const { x: rawX, y: rawY, children, disabled: rawDisabled, ...rest } = props
 
-  const {
-    setPoint,
-    notifyBottom,
-    notifyLeft,
-    notifyRight,
-    notifyTop,
-    onFocus,
-  } = useKeyboardFocus()
+  const disabled = !!(rawDisabled || children.props?.disabled)
+
+  const [x, y] = useInjectCoordinate(rawX, rawY)
+
+  const { setPoint, dispatch } = useKeyboardFocus()
 
   const inputNode = useRef<HTMLInputElement>(null)
 
+  const removePoint = useRef<() => void>()
+  useEffect(
+    () => () => {
+      removePoint.current && removePoint.current()
+    },
+    [],
+  )
   useEffect(() => {
-    if (!isNumber(x) || !isNumber(y)) return undefined
-    return setPoint({
+    if (!isNumber(x) || !isNumber(y)) return
+    removePoint.current = setPoint({
       x,
       y,
       vector: {
         disabled,
         trigger() {
-          if (!inputNode.current) return
+          if (!inputNode.current) {
+            console.error(
+              `[KeyboardFocus.AntdRadio] 坐标 (x${x}, y${y}) 缺少 ref 无法设置焦点`,
+            )
+            return
+          }
           inputNode.current.focus()
-          onFocus(x, y)
         },
       },
     })
-  }, [setPoint, x, y, disabled, onFocus])
+  }, [disabled, setPoint, x, y])
 
   return cloneElement<RadioProps>(children, {
     disabled,
     ...rest,
     ...children.props,
-    ref: inputNode,
+    ref: composeRef(
+      inputNode,
+      (children as FunctionComponentElement<unknown>)?.ref,
+    ),
     onKeyDown: (e) => {
       e.preventDefault()
       e.stopPropagation()
@@ -53,27 +70,24 @@ const RadioFocusAdapter: React.VFC<RadioFocusAdapterProps> = (props) => {
       if (typeof event2 === 'function') event2(e)
       if (!isNumber(x) || !isNumber(y)) return
       switch (e.key) {
-        case 'ArrowLeft': {
-          notifyLeft(x, y, { keySource: 'ArrowLeft' })
-          break
-        }
-        case 'ArrowRight': {
-          notifyRight(x, y, { keySource: 'ArrowRight' })
-          break
-        }
-        case 'ArrowUp': {
-          notifyTop(x, y, { keySource: 'ArrowUp' })
-          break
-        }
-        case 'ArrowDown': {
-          notifyBottom(x, y, { keySource: 'ArrowDown' })
-          break
-        }
         case 'Enter': {
           e.currentTarget?.click && e.currentTarget.click()
+          dispatch({
+            currentX: x,
+            currentY: y,
+            keyName: e.key,
+            type: 'AntdRadio',
+          })
           break
         }
-        // no default
+        default: {
+          dispatch({
+            currentX: x,
+            currentY: y,
+            keyName: e.key,
+            type: 'AntdRadio',
+          })
+        }
       }
     },
   })

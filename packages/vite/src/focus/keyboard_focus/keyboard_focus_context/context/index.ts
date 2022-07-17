@@ -1,31 +1,12 @@
 import _ from 'lodash'
 import { createContext, MutableRefObject, useContext } from 'react'
 
-import type { VectorError } from '../../constant/error'
-
-/**
- * 子坐标
- * 适用于 Table 中，一个单元格对应多个需要焦点的组件
- */
-export interface SubCoordinates {
-  x?: number
-  y?: number
-  /**
-   * 按键来源（表示用户按下的是哪一个按键才通知焦点组件）
-   */
-  keySource?: string
-}
-
-export interface Vector {
-  /**
-   * 是否禁用焦点
-   */
-  disabled?: boolean
-  /**
-   * 触发子组件（通知该组件表示它处于激活状态）
-   */
-  trigger: (subCoordinates?: SubCoordinates) => void
-}
+import {
+  DispatchOptions,
+  Vector,
+  FocusVectorOptions,
+  FocusFrom,
+} from '../../types'
 
 export interface SetPointOptions {
   x: number
@@ -42,7 +23,6 @@ export interface KeyboardFocusCtxValue {
    * 坐标数据
    */
   coordinates: MutableRefObject<(Vector | undefined | null)[][]>
-  onFocus: (x: number, y: number) => void
   /**
    * 设置坐标点，需要 y 坐标，x 坐标会自动生成
    *
@@ -52,50 +32,31 @@ export interface KeyboardFocusCtxValue {
   /**
    * 通知对应的坐标点
    */
-  notify: (
-    x: number,
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
-  /**
-   * 通知左侧的组件
-   */
-  notifyLeft: (
-    x: number,
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
-  /**
-   * 通知右侧的组件
-   */
-  notifyRight: (
-    x: number,
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
-  /**
-   * 通知上方的组件
-   */
-  notifyTop: (
-    x: number,
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
-  /**
-   * 通知下方的组件
-   */
-  notifyBottom: (
-    x: number,
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
+  notify: (x: number, y: number, focusFrom: FocusFrom) => void
   /**
    * 通知 x 轴最后一个组件
    */
-  notifyXAxisLast: (
-    y: number,
-    subCoordinates?: SubCoordinates,
-  ) => VectorError | void
+  notifyXAxisLast: (y: number, focusFrom: FocusFrom) => void
+  /**
+   * 通知 x 轴第一个组件
+   */
+  notifyFirst: (y: number, focusFrom: FocusFrom) => void
+  /**
+   * 当一个组件处于焦点后触发
+   */
+  onFocused: (x: number, y: number) => void
+  /**
+   * 触发所有坐标的 blur 函数。
+   */
+  triggerBlur: () => void
+  /**
+   * 激活对应坐标
+   */
+  focusVector: (options: FocusVectorOptions) => void
+  /**
+   * 焦点派发，在按下键盘按键时调用
+   */
+  dispatch: (options: DispatchOptions) => void
 }
 
 const KeyboardFocusCtx = createContext<KeyboardFocusCtxValue | null>(null)

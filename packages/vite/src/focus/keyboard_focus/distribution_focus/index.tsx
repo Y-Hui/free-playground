@@ -1,14 +1,19 @@
 import _ from 'lodash'
-import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 
-import { VECTOR_ERROR, VectorError } from '../constant/error'
+import { VECTOR_ERROR } from '../constant/error'
 import { InjectCoordinate, useInjectCoordinate } from '../inject_coordinate'
 import KeyboardFocusContext, {
-  AxisLimitHandler,
+  ErrorHandler,
   KeyboardFocusContextRef,
 } from '../keyboard_focus_context'
 import { useKeyboardFocus } from '../keyboard_focus_context/context'
-import isNumber from '../utils/is_number'
+import { isNumber } from '../utils'
+
+interface DistributionFocusProps {
+  x?: number
+  y?: number
+}
 
 /**
  * 将一个焦点进行分发。
@@ -20,94 +25,110 @@ import isNumber from '../utils/is_number'
  * 在一个单元格内，维护一套焦点管理系统，可以类比为现实生活中的 “路由器”。
  * 注意：在本组内通知其他焦点组件时会将 y 轴永远强制为 0。
  */
-const DistributionFocus: React.FC<PropsWithChildren> = (props) => {
-  const { children } = props
-  const {
-    setPoint,
-    notifyLeft,
-    notifyRight,
-    notifyTop,
-    notifyBottom,
-    onFocus,
-  } = useKeyboardFocus()
-  const [x, y] = useInjectCoordinate()
+const DistributionFocus: React.FC<DistributionFocusProps> = (props) => {
+  const { x: rawX, y: rawY, children } = props
+  const { setPoint, dispatch } = useKeyboardFocus()
+  const [x, y] = useInjectCoordinate(rawX, rawY)
 
   const inlineContext = useRef<KeyboardFocusContextRef>(null)
 
+  const checkDisabledAll = useCallback(() => {
+    return _.every(
+      inlineContext.current?.coordinates.current[0],
+      (item) => !item || item.disabled,
+    )
+  }, [])
+
+  const removePoint = useRef<() => void>()
+  useEffect(
+    () => () => {
+      removePoint.current && removePoint.current()
+    },
+    [],
+  )
+
   useEffect(() => {
-    if (!isNumber(x) || !isNumber(y)) return undefined
-    return setPoint({
+    if (!isNumber(x) || !isNumber(y)) return
+    removePoint.current = setPoint({
       x,
       y,
       vector: {
-        trigger(subCoordinates) {
+        blur() {
           if (!inlineContext.current) return
-          const { x: subX, keySource } = subCoordinates || {}
+          inlineContext.current.triggerBlur()
+        },
+        trigger(focusFrom) {
+          if (!inlineContext.current) return
+          const { subX: fromX, subY, keyName, type } = focusFrom || {}
+          if (checkDisabledAll()) {
+            dispatch({
+              currentX: x,
+              currentY: y,
+              keyName: keyName,
+              subX: fromX,
+              subY,
+              type,
+            })
+            return
+          }
           const maxX = _.size(inlineContext.current?.coordinates.current[0]) - 1
-          const xIndex = Math.min(subX ?? 0, maxX)
-          let result: VectorError | void
+          const xIndex = Math.min(fromX ?? 0, maxX)
+
           // 判断由哪个按键进入此坐标轴
-          switch (keySource) {
+          switch (keyName) {
             case 'ArrowLeft': {
-              inlineContext.current.notifyXAxisLast(0)
+              inlineContext.current.notifyXAxisLast(0, focusFrom)
               break
             }
             case 'ArrowRight': {
-              result = inlineContext.current?.notify(0, 0)
-              if (result === VECTOR_ERROR.DISABLED) {
-                result = inlineContext.current.notifyRight(0, 0)
-              }
+              inlineContext.current.notifyFirst(0, focusFrom)
               break
             }
             case 'ArrowUp': {
-              result = inlineContext.current.notify(xIndex, 0)
-              if (result === VECTOR_ERROR.DISABLED) {
-                result = notifyTop(x, y, subCoordinates)
-              }
+              inlineContext.current.notify(xIndex, 0, focusFrom)
               break
             }
             case 'ArrowDown': {
-              result = inlineContext.current?.notify(xIndex, 0)
-              if (result === VECTOR_ERROR.DISABLED) {
-                result = notifyBottom(x, y, subCoordinates)
-              }
+              inlineContext.current.notify(xIndex, 0, focusFrom)
+              break
             }
             // no default
-          }
-          if (result === undefined) {
-            onFocus(x, y)
           }
         },
       },
     })
-  }, [notifyBottom, notifyTop, onFocus, setPoint, x, y])
+  }, [checkDisabledAll, dispatch, setPoint, x, y])
 
-  const onAxisLimit: AxisLimitHandler = useCallback(
-    (limitType, subCoordinates) => {
+  const onError: ErrorHandler = useCallback(
+    (error, focusFrom) => {
       if (!isNumber(x) || !isNumber(y)) return
-      switch (limitType) {
+      switch (error) {
         case VECTOR_ERROR.X_MINIMUM:
-          notifyLeft(x, y, subCoordinates)
-          break
         case VECTOR_ERROR.X_MAXIMUM:
-          notifyRight(x, y, subCoordinates)
-          break
         case VECTOR_ERROR.Y_MINIMUM:
-          notifyTop(x, y, subCoordinates)
-          break
         case VECTOR_ERROR.Y_MAXIMUM:
-          notifyBottom(x, y, subCoordinates)
+        case VECTOR_ERROR.DISABLED: {
+          const { subX, subY } = focusFrom || {}
+          dispatch({
+            currentX: x,
+            currentY: y,
+            subX: subX ?? focusFrom.x,
+            subY: subY ?? focusFrom.y,
+            keyName: focusFrom.keyName,
+            type: focusFrom.type,
+          })
           break
+        }
         default:
-          console.error('[DistributionFocus]: unhandled behavior.')
+          console.error('[DistributionFocus]: unhandled behavior.', error)
       }
     },
-    [notifyBottom, notifyLeft, notifyRight, notifyTop, x, y],
+    [dispatch, x, y],
   )
 
   return (
-    <InjectCoordinate.Provider value="[null, 0]">
-      <KeyboardFocusContext ref={inlineContext} onAxisLimit={onAxisLimit}>
+    <InjectCoordinate.Provider value='[null, 0]'>
+      <KeyboardFocusContext ref={inlineContext} onError={onError}>
         {children}
       </KeyboardFocusContext>
     </InjectCoordinate.Provider>

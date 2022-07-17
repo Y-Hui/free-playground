@@ -1,27 +1,31 @@
 import type { SelectProps } from 'antd'
 import type { RefSelectProps } from 'antd/lib/select'
-import React, { cloneElement, useEffect, useRef, useState } from 'react'
+import React, {
+  cloneElement,
+  FunctionComponentElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
+import { composeRef } from '@/common/util/ref'
 
 import { useInjectCoordinate } from '../../inject_coordinate'
 import { useKeyboardFocus } from '../../keyboard_focus_context/context'
-import isNumber from '../../utils/is_number'
+import { isNumber } from '../../utils'
 import { FocusAdapterProps } from '../type'
 
 type CascaderFocusAdapterProps = SelectProps & FocusAdapterProps
 
 const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
-  const { children, disabled, ...rest } = props
-  const [x, y] = useInjectCoordinate(props.x, props.y)
+  const { x: rawX, y: rawY, children, disabled: rawDisabled, ...rest } = props
+
+  const disabled = !!(rawDisabled || children.props?.disabled)
+
+  const [x, y] = useInjectCoordinate(rawX, rawY)
 
   const context = useKeyboardFocus()
-  const {
-    setPoint,
-    notifyBottom,
-    notifyLeft,
-    notifyRight,
-    notifyTop,
-    onFocus,
-  } = context
+  const { setPoint, dispatch } = context
 
   // 焦点是否已经离开当前组件
   const hasLeft = useRef(false)
@@ -29,27 +33,46 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
 
   const selectRef = useRef<RefSelectProps>()
 
+  const removePoint = useRef<() => void>()
+  useEffect(
+    () => () => {
+      removePoint.current && removePoint.current()
+    },
+    [],
+  )
   useEffect(() => {
-    if (!isNumber(x) || !isNumber(y)) return undefined
-    return setPoint({
+    if (!isNumber(x) || !isNumber(y)) return
+    removePoint.current = setPoint({
       x,
       y,
       vector: {
         disabled,
+        blur() {
+          hasLeft.current = true
+          setOpen(false)
+        },
         trigger() {
-          if (!selectRef.current) return
-          onFocus(x, y)
+          hasLeft.current = false
+          if (!selectRef.current) {
+            console.error(
+              `[KeyboardFocus.AntdCascader] 坐标 (x${x}, y${y}) 缺少 ref 无法设置焦点`,
+            )
+            return
+          }
           selectRef.current.focus()
         },
       },
     })
-  }, [setPoint, onFocus, y, x, disabled])
+  }, [disabled, setPoint, x, y])
 
   return cloneElement<CascaderFocusAdapterProps>(children, {
     disabled,
     ...rest,
     ...children.props,
-    ref: selectRef,
+    ref: composeRef(
+      selectRef,
+      (children as FunctionComponentElement<unknown>)?.ref,
+    ),
     open,
     onDropdownVisibleChange: (e) => {
       if (hasLeft.current) {
@@ -58,8 +81,12 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
       }
       setOpen(e)
     },
-    onBlur: () => {
-      setOpen(false)
+    onMouseEnter: (e) => {
+      hasLeft.current = false
+      const handleEvent = children.props?.onMouseEnter
+      const handleEvent2 = rest?.onMouseEnter
+      handleEvent && handleEvent(e)
+      handleEvent2 && handleEvent2(e)
     },
     onInputKeyDown: (e) => {
       const event1 = rest?.onInputKeyDown
@@ -71,32 +98,29 @@ const CascaderFocusAdapter: React.VFC<CascaderFocusAdapterProps> = (props) => {
         event2(e)
       }
       if (!isNumber(x) || !isNumber(y)) return
+      const switchFocus = () => {
+        dispatch({
+          currentX: x,
+          currentY: y,
+          keyName: e.key,
+          type: 'AntdCascader',
+        })
+      }
       switch (e.key) {
-        case 'ArrowLeft': {
-          if (open) return
-          hasLeft.current =
-            notifyLeft(x, y, { keySource: 'ArrowLeft' }) === undefined
-          break
-        }
+        case 'ArrowLeft':
         case 'ArrowRight': {
-          if (open) return
-          hasLeft.current =
-            notifyRight(x, y, { keySource: 'ArrowRight' }) === undefined
+          if (open) {
+            e.preventDefault()
+            return
+          }
+          switchFocus()
           break
         }
-        case 'ArrowUp': {
+        default: {
           if (open) return
-          hasLeft.current =
-            notifyTop(x, y, { keySource: 'ArrowUp' }) === undefined
+          switchFocus()
           break
         }
-        case 'ArrowDown': {
-          if (open) return
-          hasLeft.current =
-            notifyBottom(x, y, { keySource: 'ArrowDown' }) === undefined
-          break
-        }
-        // no default
       }
     },
   })

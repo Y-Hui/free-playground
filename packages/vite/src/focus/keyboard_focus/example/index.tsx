@@ -114,7 +114,7 @@ const Example: React.VFC = () => {
                 </Form.Item>
               )}
               <Button
-                type="link"
+                type='link'
                 onClick={() => {
                   setData((rawData) => {
                     const res = _.slice(rawData)
@@ -161,9 +161,9 @@ const Example: React.VFC = () => {
             <Form.Item name={[index, 'select']} noStyle>
               <KeyboardFocus.AntdSelect>
                 <Select style={{ width: '100%' }}>
-                  <Option value="jack">Jack</Option>
-                  <Option value="lucy">Lucy</Option>
-                  <Option value="Yiminghe">yiminghe</Option>
+                  <Option value='jack'>Jack</Option>
+                  <Option value='lucy'>Lucy</Option>
+                  <Option value='Yiminghe'>yiminghe</Option>
                 </Select>
               </KeyboardFocus.AntdSelect>
             </Form.Item>
@@ -179,7 +179,7 @@ const Example: React.VFC = () => {
             <Form.Item name={[index, 'enter']} noStyle>
               <KeyboardFocus.Input>
                 <Input
-                  placeholder="请按下回车"
+                  placeholder='请按下回车'
                   onPressEnter={() => {
                     Modal.confirm({
                       content: '哈哈哈哈',
@@ -198,7 +198,7 @@ const Example: React.VFC = () => {
           return (
             <Form.Item name={[index, 'cascader']} noStyle>
               <KeyboardFocus.AntdCascader>
-                <Cascader options={options} placeholder="Please select" />
+                <Cascader options={options} placeholder='Please select' />
               </KeyboardFocus.AntdCascader>
             </Form.Item>
           )
@@ -235,7 +235,7 @@ const Example: React.VFC = () => {
           return (
             <>
               <Button
-                type="link"
+                type='link'
                 onClick={() => {
                   setData((rawData) => {
                     const res = _.slice(rawData)
@@ -247,7 +247,7 @@ const Example: React.VFC = () => {
                 新增
               </Button>
               <Button
-                type="link"
+                type='link'
                 danger
                 onClick={() => {
                   setData((rawData) => {
@@ -273,7 +273,7 @@ const Example: React.VFC = () => {
         console.log(e)
       }}
     >
-      <Button type="primary" htmlType="submit">
+      <Button type='primary' htmlType='submit'>
         表单提交
       </Button>
       <Button
@@ -287,7 +287,7 @@ const Example: React.VFC = () => {
         <Table
           dataSource={data}
           pagination={false}
-          size="small"
+          size='small'
           columns={columns}
         />
       </KeyboardFocus.AntdTable>
